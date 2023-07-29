@@ -1,0 +1,48 @@
+.game-container{
+    display: grid;
+    grid-template-areas:
+        "attempts-bar attempts-bar"
+        "word-grid guess-input";
+
+    grid-template-rows: 2em;
+    grid-template-columns: max-content;
+}
+
+.word-grid {
+    grid-area: word-grid;
+    display: flex;
+    flex-direction: column;
+}
+
+.word-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.word-char:hover {
+    background-color: #296f3a;
+    color: #15160c;
+    cursor: pointer;
+}
+
+.attempts-bar {
+    display: flex;
+    align-items: start;
+    padding-bottom: 10px;
+}
+
+.attempts-label {
+    margin-right: 10px;
+}
+
+.attempt {
+    margin-left: 5px;
+    grid-area: attempts-bar;
+}
+
+.guess-input {
+    grid-area: guess-input;
+    display: flex;
+    align-items: flex-end;
+    margin-left: 20px;
+}
