@@ -2,24 +2,51 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <title>BlazorTerminal.Client</title>
-    <base href="/" />
-    <link href="css/app.css" rel="stylesheet" />
+    <meta charset="utf-8"/>
+    <title>Terminal</title>
+    <base href="/"/>
+    <link href="css/app.css" rel="stylesheet"/>
     
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="BlazorTerminal.Client.styles.css" rel="stylesheet" /> -->
 </head>
 
 <body>
-    <div id="app">Loading...</div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+<div id="app">
+    <div id="loading">
+        <div class="loadChar">
+            <span>A</span>
+            <span>ö</span>
+            <span>;</span>
+            <span>:</span>
+        </div>
+        <div class="loadChar">
+            <span>?</span>
+            <span>_</span>
+            <span>-</span>
+            <span>:</span>
+        </div>
+        <div class="loadChar">
+            <span>;</span>
+            <span>Å</span>
+            <span>&&</span>
+            <span>$</span>
+        </div>
+        <div class="loadChar">
+            <span>&</span>
+            <span>£</span>
+            <span>#</span>
+            <span>"</span>
+        </div>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>
