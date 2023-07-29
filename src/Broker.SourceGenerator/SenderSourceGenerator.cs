@@ -126,8 +126,7 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
                                      }
                                  }
                          
-                                 public async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default)
-                                     where TRequest : IRequest<TResponse>
+                                 public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
                                  {
                                      switch (request)
                                      {
@@ -135,6 +134,7 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
                                          default:
                                              throw new InvalidOperationException($"No handler registered for type {request.GetType()}");
                                      }
+                                     throw new InvalidOperationException("No handler registered for type");
                                  }
                              }
                              """;

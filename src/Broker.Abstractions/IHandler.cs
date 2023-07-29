@@ -12,4 +12,4 @@ public interface IHandler<in TRequest> where TRequest : IRequest
 
 public interface IRequest { }
 
-public interface IRequest<out TResponse> : IRequest { }
+public interface IRequest<out TResponse>  { }
