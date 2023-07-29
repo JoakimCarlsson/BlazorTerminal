@@ -3,24 +3,24 @@
 internal interface IGameSessionsRepository
 {
     public ValueTask<GameSession> CreateAsync(
-        GameSession gameSession, 
+        GameSession gameSession,
         CancellationToken cancellationToken = default
-        );
-    
+    );
+
     public ValueTask<GameSession?> GetAsync(
         Guid id,
         CancellationToken cancellationToken = default
-        );
-    
+    );
+
     public ValueTask<GameSession> UpdateAsync(
         GameSession gameSession,
         CancellationToken cancellationToken = default
-        );
-    
+    );
+
     public ValueTask DeleteAsync(
-        Guid id, 
+        Guid id,
         CancellationToken cancellationToken = default
-        );
+    );
 }
 
 internal sealed class GameSessionsRepository : IGameSessionsRepository
@@ -32,17 +32,18 @@ internal sealed class GameSessionsRepository : IGameSessionsRepository
         _gameSessionsContainer = cosmosClient.GetContainer(
             CosmosGlobals.DatabaseName,
             CosmosGlobals.GameSessionContainerName
-            );
+        );
     }
 
-    public async ValueTask<GameSession> CreateAsync(GameSession gameSession, CancellationToken cancellationToken = default)
+    public async ValueTask<GameSession> CreateAsync(GameSession gameSession,
+        CancellationToken cancellationToken = default)
     {
         var cosmosResponse = await _gameSessionsContainer.CreateItemAsync(
             gameSession,
             new PartitionKey(gameSession.Id.ToString()),
             cancellationToken: cancellationToken
         );
-        
+
         return cosmosResponse.Resource;
     }
 
@@ -64,14 +65,15 @@ internal sealed class GameSessionsRepository : IGameSessionsRepository
         }
     }
 
-    public async ValueTask<GameSession> UpdateAsync(GameSession gameSession, CancellationToken cancellationToken = default)
+    public async ValueTask<GameSession> UpdateAsync(GameSession gameSession,
+        CancellationToken cancellationToken = default)
     {
         var cosmosResponse = await _gameSessionsContainer.UpsertItemAsync(
             gameSession,
             new PartitionKey(gameSession.Id.ToString()),
             cancellationToken: cancellationToken
         );
-        
+
         return cosmosResponse.Resource;
     }
 
@@ -80,7 +82,8 @@ internal sealed class GameSessionsRepository : IGameSessionsRepository
         await _gameSessionsContainer.DeleteItemAsync<GameSession>(
             id.ToString(),
             new PartitionKey(id.ToString()),
-            cancellationToken: cancellationToken
+            new ItemRequestOptions { EnableContentResponseOnWrite = false },
+            cancellationToken
         );
     }
 }
