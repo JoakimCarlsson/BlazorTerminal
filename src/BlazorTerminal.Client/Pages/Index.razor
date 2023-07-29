@@ -5,7 +5,7 @@
     <div class="game-container">
         <div class="attempts-bar">
             <span class="attempts-label">Attempts Remaining: </span>
-            @for (int i = 0; i < _gameSessionDetails.AttemptsRemaining; i++)
+            @for (int i = 0; i < _attemptsRemaining; i++)
             {
                 <span class="attempt">■</span>
             }
@@ -24,7 +24,7 @@
                         {
                             var word = rowWords[nextWordIndex];
                             var wordHover = word.Word;
-                            <span class="word-char" @onmouseover="() => ShowHoveredText(wordHover)">@word.Word</span>
+                            <span class="word-char" @onmouseover="() => ShowHoveredText(wordHover)" @onclick="() => GuessWordAsync(wordHover)">@word.Word</span>
                             j += word.Word.Length - 1;
                             nextWordIndex++;
                         }
@@ -39,7 +39,11 @@
         </div>
         
         <div class="guess-input">
-            @_inputText
+            @foreach (var text in _resultTexts)
+            {
+                <span> > @text</span>
+            }
+            <span> > @_inputText</span>
         </div>
     </div>
 }

@@ -3,7 +3,9 @@
 internal sealed record GameSession(
     Guid Id,
     string CurrentWord,
-    IEnumerable<string> ScrambledWords,
-    int AttemptsRemaining,
-    string Status
-);
+    IEnumerable<string> ScrambledWords
+)
+{
+    public int AttemptsRemaining { get; set; }
+    public string Status { get; set; }
+}

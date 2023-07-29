@@ -3,19 +3,22 @@
 public partial class Index : IDisposable
 {
     [Inject] private BlazorTerminalApiService BlazorTerminalApiService { get; set; } = default!;
-    
+
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private GameSessionDetails? _gameSessionDetails;
-    
+    private GameSessionDetailsResponse? _gameSessionDetails;
+
     private readonly Random _random = new();
     private readonly char[][] _characterGrid = new char[20][];
     private readonly List<WordPlacement> _wordPlacements = new();
     private readonly List<GridWord> _gridWords = new();
-    
+    private readonly List<string> _resultTexts = new();
+
     private const int _gridWidth = 40;
     private const int _gridHeight = 20;
-    
+
     private string _inputText = string.Empty;
+    private int _attemptsRemaining = 0;
+    
     
     protected override async Task OnInitializedAsync()
     {
@@ -25,6 +28,8 @@ public partial class Index : IDisposable
 
         if (_gameSessionDetails is null)
             return;
+        
+        _attemptsRemaining = _gameSessionDetails.AttemptsRemaining;
         
         InitializeGrid();
         FillGridWithWords();
@@ -78,7 +83,7 @@ public partial class Index : IDisposable
             }
         }
     }
-    
+
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();
@@ -87,5 +92,20 @@ public partial class Index : IDisposable
     private void ShowHoveredText(string text)
     {
         _inputText = text;
+    }
+
+    private async Task GuessWordAsync(string word)
+    {
+        var response = await BlazorTerminalApiService.GuessWordAsync(
+            _gameSessionDetails!.Id,
+            word,
+            _cancellationTokenSource.Token
+        );
+
+        if (response.IsCorrect is false)
+        {
+            _attemptsRemaining = response.RemainingAttempts;
+            _resultTexts.Add($"Entry is incorrect, likeliness: {response.CorrectLetters}");
+        }
     }
 }
