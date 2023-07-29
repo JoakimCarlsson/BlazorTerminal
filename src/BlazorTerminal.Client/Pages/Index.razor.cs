@@ -15,6 +15,8 @@ public partial class Index : IDisposable
     private const int _gridWidth = 40;
     private const int _gridHeight = 20;
     
+    private string _inputText = string.Empty;
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -71,7 +73,7 @@ public partial class Index : IDisposable
             {
                 if (_characterGrid[i][j] == default)
                 {
-                    var randomCharacter = possibleCharacters[_random.Next(0, possibleCharacters.Length)];
+                    _characterGrid[i][j] = possibleCharacters[_random.Next(0, possibleCharacters.Length)];
                 }
             }
         }
@@ -80,5 +82,10 @@ public partial class Index : IDisposable
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();
+    }
+
+    private void ShowHoveredText(string text)
+    {
+        _inputText = text;
     }
 }

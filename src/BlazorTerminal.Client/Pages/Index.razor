@@ -2,28 +2,44 @@
 
 @if (_gameSessionDetails is not null)
 {
-    <div class="grid">
-        @for (int i = 0; i < 20; i++)
-        {
-            <div class="grid-row">
-                @{ var rowWords = _gridWords.Where(w => w.StartRow == i).OrderBy(w => w.StartColumn).ToList(); }
-                @{ int nextWordIndex = 0; }
+    <div class="game-container">
+        <div class="attempts-bar">
+            <span class="attempts-label">Attempts Remaining: </span>
+            @for (int i = 0; i < _gameSessionDetails.AttemptsRemaining; i++)
+            {
+                <span class="attempt">■</span>
+            }
+        </div>
 
-                @for (int j = 0; j < _gridWidth; j++)
-                {
-                    if (nextWordIndex < rowWords.Count && rowWords[nextWordIndex].StartColumn == j)
+        <div class="word-grid">
+            @for (int i = 0; i < 20; i++)
+            {
+                <div class="word-row">
+                    @{ var rowWords = _gridWords.Where(w => w.StartRow == i).OrderBy(w => w.StartColumn).ToList(); }
+                    @{ int nextWordIndex = 0; }
+
+                    @for (int j = 0; j < _gridWidth; j++)
                     {
-                        var word = rowWords[nextWordIndex];
-                        <span class="grid-char">@word.Word</span>
-                        j += word.Word.Length - 1;
-                        nextWordIndex++;
+                        if (nextWordIndex < rowWords.Count && rowWords[nextWordIndex].StartColumn == j)
+                        {
+                            var word = rowWords[nextWordIndex];
+                            var wordHover = word.Word;
+                            <span class="word-char" @onmouseover="() => ShowHoveredText(wordHover)">@word.Word</span>
+                            j += word.Word.Length - 1;
+                            nextWordIndex++;
+                        }
+                        else
+                        {
+                            var charHover = _characterGrid[i][j].ToString();
+                            <span class="word-char"@onmouseover="() => ShowHoveredText(charHover)">@_characterGrid[i][j]</span>
+                        }
                     }
-                    else
-                    {
-                        <span class="grid-char">@_characterGrid[i][j]</span>
-                    }
-                }
-            </div>
-        }
+                </div>
+            }
+        </div>
+        
+        <div class="guess-input">
+            @_inputText
+        </div>
     </div>
 }
