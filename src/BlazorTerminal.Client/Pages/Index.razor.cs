@@ -7,8 +7,13 @@ public partial class Index : IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private GameSessionDetails? _gameSessionDetails;
     
-    private char[][] _characterGrid = new char[20][];
-    private List<WordPlacement> _wordPlacements = new();
+    private readonly Random _random = new();
+    private readonly char[][] _characterGrid = new char[20][];
+    private readonly List<WordPlacement> _wordPlacements = new();
+    private readonly List<GridWord> _gridWords = new();
+    
+    private const int _gridWidth = 40;
+    private const int _gridHeight = 20;
     
     protected override async Task OnInitializedAsync()
     {
@@ -18,44 +23,60 @@ public partial class Index : IDisposable
 
         if (_gameSessionDetails is null)
             return;
+        
+        InitializeGrid();
+        FillGridWithWords();
+        FillGridWithRandomCharacters();
+    }
 
-        for (var i = 0; i < 20; i++)
+    private void InitializeGrid()
+    {
+        for (int i = 0; i < _gridHeight; i++)
         {
-            _characterGrid[i] = new char[20 * 5];
+            _characterGrid[i] = new char[_gridWidth];
         }
+    }
 
-        var random = new Random();
+    private void FillGridWithWords()
+    {
         foreach (var word in _gameSessionDetails.ScrambledWords)
         {
-            var row = random.Next(0, 20);
-            var column = random.Next(0, 20) * 5;
+            var row = _random.Next(0, _gridHeight);
+            var column = _random.Next(0, _gridWidth - word.Length);
 
-            _wordPlacements.Add(new WordPlacement
+            var wordPlacement = new WordPlacement
             {
-                Word = word.PadRight(5, '\0'),
+                Word = word,
                 StartRow = row,
                 StartColumn = column
-            });
+            };
 
-            for (var i = 0; i < 5; i++)
+            _wordPlacements.Add(wordPlacement);
+
+            for (int i = 0; i < word.Length; i++)
             {
-                _characterGrid[row][column + i] = i < word.Length ? word[i] : ' ';
+                _characterGrid[row][column + i] = word[i];
             }
-        }
 
+            _gridWords.Add(new GridWord { Placement = wordPlacement });
+        }
+    }
+
+    private void FillGridWithRandomCharacters()
+    {
         var possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
-        for (var i = 0; i < 20; i++)
+        for (int i = 0; i < _gridHeight; i++)
         {
-            for (var j = 0; j < 20 * 5; j++)
+            for (int j = 0; j < _gridWidth; j++)
             {
-                if (_characterGrid[i][j] == '\0')
+                if (_characterGrid[i][j] == default)
                 {
-                    _characterGrid[i][j] = possibleCharacters[random.Next(possibleCharacters.Length)];
+                    var randomCharacter = possibleCharacters[_random.Next(0, possibleCharacters.Length)];
                 }
             }
         }
     }
-
+    
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();

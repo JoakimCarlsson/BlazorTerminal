@@ -2,23 +2,28 @@
 
 @if (_gameSessionDetails is not null)
 {
-    <div style="display: grid; grid-template-columns: repeat(20, 1fr);">
-        @for (var i = 0; i < 20; i++)
+    <div class="grid">
+        @for (int i = 0; i < 20; i++)
         {
-            @for (var j = 0; j < 20 * 5; j += 5) // jump by 5
-            {
-                var placement = _wordPlacements.FirstOrDefault(p => p.StartRow == i && p.StartColumn == j);
+            <div class="grid-row">
+                @{ var rowWords = _gridWords.Where(w => w.StartRow == i).OrderBy(w => w.StartColumn).ToList(); }
+                @{ int nextWordIndex = 0; }
 
-                if (placement != null)
+                @for (int j = 0; j < _gridWidth; j++)
                 {
-                    <div class="word">@placement.Word</div>
+                    if (nextWordIndex < rowWords.Count && rowWords[nextWordIndex].StartColumn == j)
+                    {
+                        var word = rowWords[nextWordIndex];
+                        <span class="grid-char">@word.Word</span>
+                        j += word.Word.Length - 1;
+                        nextWordIndex++;
+                    }
+                    else
+                    {
+                        <span class="grid-char">@_characterGrid[i][j]</span>
+                    }
                 }
-                else
-                {
-                    var filler = new string(_characterGrid[i].Skip(j).Take(5).ToArray());
-                    <div class="word">@filler</div>
-                }
-            }
+            </div>
         }
     </div>
 }

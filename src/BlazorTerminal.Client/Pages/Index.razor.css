@@ -1,4 +1,14 @@
-.word:hover {
+.grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.grid-char:hover {
     background-color: #296f3a;
     color: #15160c;
     cursor: pointer;
