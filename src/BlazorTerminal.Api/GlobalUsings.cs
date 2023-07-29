@@ -10,6 +10,8 @@ global using BlazorTerminal.Api.Feature.Game;
 global using BlazorTerminal.Api.Feature.Game.Create;
 global using BlazorTerminal.Api.Feature.Game.Models;
 
+global using BlazorTerminal.Api.Extensions;
+
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Azure.Cosmos;

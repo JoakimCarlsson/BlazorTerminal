@@ -1,6 +1,4 @@
-﻿using BlazorTerminal.Api.Extensions;
-
-namespace BlazorTerminal.Api.Feature.Game.Create;
+﻿namespace BlazorTerminal.Api.Feature.Game.Create;
 
 internal sealed record CreateGameCommand : IRequest<Results<Created<GameSessionDetails>, BadRequest>>;
 

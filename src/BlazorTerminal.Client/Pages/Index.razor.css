@@ -1,0 +1,5 @@
+.word:hover {
+    background-color: #296f3a;
+    color: #15160c;
+    cursor: pointer;
+}

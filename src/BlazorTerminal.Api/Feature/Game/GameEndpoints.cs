@@ -9,7 +9,7 @@ internal static class GameEndpoints
             .WithTags("Game")
             .WithOpenApi();
         
-        endpointGroup.MapPost("/start", (
+        endpointGroup.MapPost("/", (
             [FromServices] ISender sender,
             CancellationToken cancellationToken
         ) => sender.SendAsync(new CreateGameCommand(), cancellationToken))
