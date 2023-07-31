@@ -5,6 +5,8 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        //todo use StringWriter & IndentedTextWriter
+        
         var compilationProvider = context.CompilationProvider;
 
         context.RegisterSourceOutput(
