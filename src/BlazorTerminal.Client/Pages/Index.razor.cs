@@ -19,6 +19,7 @@ public partial class Index : IDisposable
     private string _inputText = string.Empty;
     private int _attemptsRemaining = 0;
     
+    private bool _guessedRight = false;
     
     protected override async Task OnInitializedAsync()
     {
@@ -101,11 +102,16 @@ public partial class Index : IDisposable
             word,
             _cancellationTokenSource.Token
         );
-
+        
         if (response.IsCorrect is false)
         {
             _attemptsRemaining = response.RemainingAttempts;
             _resultTexts.Add($"Entry is incorrect, likeliness: {response.CorrectLetters}");
+        }
+
+        if (response.IsCorrect)
+        {
+            _guessedRight = true;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@page "/"
 
-@if (_gameSessionDetails is not null)
+@if (_gameSessionDetails is not null && _guessedRight is false)
 {
     <div class="game-container">
         <div class="attempts-bar">
@@ -37,7 +37,7 @@
                 </div>
             }
         </div>
-        
+
         <div class="guess-input">
             @foreach (var text in _resultTexts)
             {
@@ -46,4 +46,24 @@
             <span> > @_inputText</span>
         </div>
     </div>
+    
+    <button @onclick="OpenDialog">Open Dialog</button>
+
+    <Dialog Title="Dialog Title" IsOpen="dialogIsOpen" IsOpenChanged="DialogIsOpenChanged">
+        <p>Some dialog content...</p>
+    </Dialog>
+}
+
+@code {
+    private bool dialogIsOpen = false;
+
+    void OpenDialog()
+    {
+        dialogIsOpen = true;
+    }
+
+    void DialogIsOpenChanged(bool isOpen)
+    {
+        dialogIsOpen = isOpen;
+    }
 }
