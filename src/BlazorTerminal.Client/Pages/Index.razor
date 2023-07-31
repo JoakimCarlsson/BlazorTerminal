@@ -1,30 +1,32 @@
 ﻿@page "/"
 
-@if (_gameSessionDetails is not null)
-{
-    <div class="game-container">
+<div class="game-container">
+    @if (_gameSessionDetails is not null &&
+         _guessedRight is false &&
+         _gameOver is false)
+    {
         <div class="attempts-bar">
             <span class="attempts-label">Attempts Remaining: </span>
-            @for (int i = 0; i < _gameSessionDetails.AttemptsRemaining; i++)
+            @for (int i = 0; i < _attemptsRemaining; i++)
             {
                 <span class="attempt">■</span>
             }
         </div>
 
         <div class="word-grid">
-            @for (int i = 0; i < 20; i++)
+            @for (int i = 0; i < GridHeight; i++)
             {
                 <div class="word-row">
                     @{ var rowWords = _gridWords.Where(w => w.StartRow == i).OrderBy(w => w.StartColumn).ToList(); }
                     @{ int nextWordIndex = 0; }
 
-                    @for (int j = 0; j < _gridWidth; j++)
+                    @for (int j = 0; j < GridWidth; j++)
                     {
                         if (nextWordIndex < rowWords.Count && rowWords[nextWordIndex].StartColumn == j)
                         {
                             var word = rowWords[nextWordIndex];
                             var wordHover = word.Word;
-                            <span class="word-char" @onmouseover="() => ShowHoveredText(wordHover)">@word.Word</span>
+                            <span class="word-char" @onmouseover="() => ShowHoveredText(wordHover)" @onclick="() => GuessWordAsync(wordHover)">@word.Word</span>
                             j += word.Word.Length - 1;
                             nextWordIndex++;
                         }
@@ -37,9 +39,23 @@
                 </div>
             }
         </div>
-        
+
         <div class="guess-input">
-            @_inputText
+            @foreach (var text in _resultTexts)
+            {
+                <span> > @text</span>
+            }
+            <span> > @_inputText</span>
         </div>
-    </div>
-}
+    }
+
+    @if (_guessedRight)
+    {
+        <div>:)</div>
+    }
+
+    @if (_gameOver)
+    {
+        <div>:(</div>
+    }
+</div>

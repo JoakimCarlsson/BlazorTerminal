@@ -3,19 +3,24 @@
 public partial class Index : IDisposable
 {
     [Inject] private BlazorTerminalApiService BlazorTerminalApiService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private GameSessionDetails? _gameSessionDetails;
-    
+    private GameSessionDetailsResponse? _gameSessionDetails;
+
     private readonly Random _random = new();
     private readonly char[][] _characterGrid = new char[20][];
     private readonly List<WordPlacement> _wordPlacements = new();
     private readonly List<GridWord> _gridWords = new();
-    
-    private const int _gridWidth = 40;
-    private const int _gridHeight = 20;
-    
+    private readonly List<string> _resultTexts = new();
+
+    private const int GridWidth = 40;
+    private const int GridHeight = 20;
+
     private string _inputText = string.Empty;
+    private int _attemptsRemaining;
+    private bool _guessedRight;
+    private bool _gameOver;
     
     protected override async Task OnInitializedAsync()
     {
@@ -26,6 +31,8 @@ public partial class Index : IDisposable
         if (_gameSessionDetails is null)
             return;
         
+        _attemptsRemaining = _gameSessionDetails.AttemptsRemaining;
+        
         InitializeGrid();
         FillGridWithWords();
         FillGridWithRandomCharacters();
@@ -33,9 +40,9 @@ public partial class Index : IDisposable
 
     private void InitializeGrid()
     {
-        for (int i = 0; i < _gridHeight; i++)
+        for (var i = 0; i < GridHeight; i++)
         {
-            _characterGrid[i] = new char[_gridWidth];
+            _characterGrid[i] = new char[GridWidth];
         }
     }
 
@@ -43,8 +50,8 @@ public partial class Index : IDisposable
     {
         foreach (var word in _gameSessionDetails.ScrambledWords)
         {
-            var row = _random.Next(0, _gridHeight);
-            var column = _random.Next(0, _gridWidth - word.Length);
+            var row = _random.Next(0, GridHeight);
+            var column = _random.Next(0, GridWidth - word.Length);
 
             var wordPlacement = new WordPlacement
             {
@@ -55,7 +62,7 @@ public partial class Index : IDisposable
 
             _wordPlacements.Add(wordPlacement);
 
-            for (int i = 0; i < word.Length; i++)
+            for (var i = 0; i < word.Length; i++)
             {
                 _characterGrid[row][column + i] = word[i];
             }
@@ -67,9 +74,9 @@ public partial class Index : IDisposable
     private void FillGridWithRandomCharacters()
     {
         var possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
-        for (int i = 0; i < _gridHeight; i++)
+        for (var i = 0; i < GridHeight; i++)
         {
-            for (int j = 0; j < _gridWidth; j++)
+            for (var j = 0; j < GridWidth; j++)
             {
                 if (_characterGrid[i][j] == default)
                 {
@@ -78,7 +85,7 @@ public partial class Index : IDisposable
             }
         }
     }
-    
+
     public void Dispose()
     {
         _cancellationTokenSource.Cancel();
@@ -87,5 +94,26 @@ public partial class Index : IDisposable
     private void ShowHoveredText(string text)
     {
         _inputText = text;
+    }
+
+    private async Task GuessWordAsync(string word)
+    {
+        var response = await BlazorTerminalApiService.GuessWordAsync(
+            _gameSessionDetails!.Id,
+            word,
+            _cancellationTokenSource.Token
+        );
+
+        if (response.IsGameOver)
+            _gameOver = true;
+        
+        if (response.IsCorrect is false)
+        {
+            _attemptsRemaining = response.RemainingAttempts;
+            _resultTexts.Add($"Entry is incorrect, likeliness: {response.CorrectLetters}");
+        }
+
+        if (response.IsCorrect)
+            _guessedRight = true;
     }
 }

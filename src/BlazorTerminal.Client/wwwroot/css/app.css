@@ -2,9 +2,9 @@ body {
     background: #15160c url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMyIgaGVpZ2h0PSIzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjEiIGN5PSIxIiByPSIxIiBmaWxsPSIjMmEyYTIiLz48L3N2Zz4=') repeat;
     color: #296f3a;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 2em;
+    font-size: 1.5em;
     text-align: center;
-    text-shadow: 0 0 10px #296f3a, 0 0 20px #296f3a, 0 0 30px #296f3a, 0 0 40px #296f3a;
+    /*text-shadow: 0 0 10px #296f3a, 0 0 20px #296f3a, 0 0 30px #296f3a, 0 0 40px #296f3a;*/
 }
 
 .loadChar {

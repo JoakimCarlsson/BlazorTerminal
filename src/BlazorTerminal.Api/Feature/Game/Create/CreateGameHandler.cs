@@ -1,8 +1,9 @@
 ﻿namespace BlazorTerminal.Api.Feature.Game.Create;
 
-internal sealed record CreateGameCommand : IRequest<Results<Created<GameSessionDetails>, BadRequest>>;
+internal sealed record CreateGameCommand : IRequest<Results<Created<GameSessionDetailsResponse>, BadRequest>>;
 
-internal sealed class CreateGameHandler : IHandler<CreateGameCommand, Results<Created<GameSessionDetails>, BadRequest>>
+internal sealed class
+    CreateGameHandler : IHandler<CreateGameCommand, Results<Created<GameSessionDetailsResponse>, BadRequest>>
 {
     private readonly IGameSessionsRepository _gameSessionsRepository;
     private readonly IDistributedCache _distributedCache;
@@ -10,25 +11,27 @@ internal sealed class CreateGameHandler : IHandler<CreateGameCommand, Results<Cr
     public CreateGameHandler(
         IGameSessionsRepository gameSessionsRepository,
         IDistributedCache distributedCache
-        )
+    )
     {
         _gameSessionsRepository = gameSessionsRepository;
         _distributedCache = distributedCache;
     }
 
-    public async Task<Results<Created<GameSessionDetails>, BadRequest>> HandleAsync(CreateGameCommand request,
+    public async Task<Results<Created<GameSessionDetailsResponse>, BadRequest>> HandleAsync(CreateGameCommand request,
         CancellationToken cancellationToken = default)
     {
         var random = new Random();
         var scrambledWords = GenerateWords(10, 5).ToList();
-        
+
         var gameSession = new GameSession(
             Guid.NewGuid(),
             scrambledWords.ElementAt(random.Next(0, scrambledWords.Count())),
-            scrambledWords,
-            5,
-            "In Progress"
-        );
+            scrambledWords
+        )
+        {
+            AttemptsRemaining = 5,
+            Status = "In Progress"
+        };
 
         var createdSession = await _gameSessionsRepository.CreateAsync(gameSession, cancellationToken);
 
@@ -40,17 +43,17 @@ internal sealed class CreateGameHandler : IHandler<CreateGameCommand, Results<Cr
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             },
             cancellationToken);
-        
+
         return TypedResults.Created(
             $"api/game/{createdSession.Id}",
-            new GameSessionDetails(
+            new GameSessionDetailsResponse(
                 createdSession.Id,
                 createdSession.ScrambledWords,
                 createdSession.AttemptsRemaining
             )
         );
     }
-    
+
     //get a list of words from somewhere else :-)
     private IEnumerable<string> GenerateWords(int wordCount, int wordLength)
     {
@@ -72,7 +75,8 @@ internal sealed class CreateGameHandler : IHandler<CreateGameCommand, Results<Cr
 
     private IEnumerable<string> GetWords()
     {
-        return new List<string> {
+        return new List<string>
+        {
             "ABOUT", "AFTER", "APPLE", "ARISE", "BASIC", "BLAME", "BRICK", "CHAIR", "CHIEF", "CHILD",
             "CLAIM", "CLASS", "CLEAR", "CLOCK", "COULD", "CROSS", "DANCE", "DRINK", "EARTH", "EIGHT",
             "EQUAL", "ERROR", "FINAL", "FIRST", "FIXED", "FLAME", "FRESH", "FRUIT", "GLASS", "GUESS",

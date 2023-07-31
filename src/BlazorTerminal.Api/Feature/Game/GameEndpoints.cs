@@ -15,5 +15,13 @@ internal static class GameEndpoints
         ) => sender.SendAsync(new CreateGameCommand(), cancellationToken))
             .WithName("Start Game Session")
             .WithDescription("Starts a new game session");
+        
+        endpointGroup.MapPost("/{GameId:guid}/guess", (
+                [AsParameters] GuessWordCommand command,
+                [FromServices] ISender sender,
+                CancellationToken cancellationToken
+            ) => sender.SendAsync(command, cancellationToken))
+            .WithName("Guess Word")
+            .WithDescription("Starts a new game session");
     }
 }

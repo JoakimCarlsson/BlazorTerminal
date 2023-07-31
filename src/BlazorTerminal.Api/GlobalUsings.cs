@@ -8,7 +8,7 @@ global using BlazorTerminal.Api.Persistence.Extensions;
 
 global using BlazorTerminal.Api.Feature.Game;
 global using BlazorTerminal.Api.Feature.Game.Create;
-global using BlazorTerminal.Api.Feature.Game.Models;
+global using BlazorTerminal.Api.Feature.Game.Guess;
 
 global using BlazorTerminal.Api.Extensions;
 

@@ -1,0 +1,94 @@
+﻿.dialog-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog {
+    background-color: #15160c;
+    border: 2px solid #296f3a;
+    max-width: 80%;
+}
+
+.dialog-header {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #296f3a;
+}
+
+.dialog-body {
+    padding: 5px;
+}
+
+.dialog-header h2, .dialog-header button {
+    color: #296f3a;
+}
+
+.dialog-header button {
+    background-color: #15160c;
+    border: none;
+    cursor: pointer;
+}
+
+.dialog-body::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(rgba(255,255,255,0.03) 50%, transparent 50%);
+    background-size: 100% 2px;
+    z-index: 1;
+    pointer-events: none;
+    animation: scan-lines 1s linear infinite;
+}
+
+@keyframes scan-lines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
+.dialog-body {
+    overflow: hidden;
+    border-right: .1em solid #296f3a;
+    white-space: nowrap;
+    margin: 0 auto;
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite; 
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #296f3a; }
+}
+
+
+.dialog {
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    animation: fadeIn .5s ease-in-out forwards;
+}
+
+.dialog-overlay.show > .dialog {
+    animation: fadeOut .5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}

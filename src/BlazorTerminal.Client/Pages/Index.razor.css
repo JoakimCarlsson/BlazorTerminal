@@ -43,6 +43,8 @@
 .guess-input {
     grid-area: guess-input;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-end;
     margin-left: 20px;
 }
