@@ -1,8 +1,10 @@
 ﻿@page "/"
 
-@if (_gameSessionDetails is not null && _guessedRight is false)
-{
-    <div class="game-container">
+<div class="game-container">
+    @if (_gameSessionDetails is not null &&
+         _guessedRight is false &&
+         _gameOver is false)
+    {
         <div class="attempts-bar">
             <span class="attempts-label">Attempts Remaining: </span>
             @for (int i = 0; i < _attemptsRemaining; i++)
@@ -45,5 +47,15 @@
             }
             <span> > @_inputText</span>
         </div>
-    </div>
-}
+    }
+
+    @if (_guessedRight)
+    {
+        <div>:)</div>
+    }
+
+    @if (_gameOver)
+    {
+        <div>:(</div>
+    }
+</div>

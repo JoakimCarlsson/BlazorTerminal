@@ -3,7 +3,8 @@
 public partial class Index : IDisposable
 {
     [Inject] private BlazorTerminalApiService BlazorTerminalApiService { get; set; } = default!;
-
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private GameSessionDetailsResponse? _gameSessionDetails;
 
@@ -17,9 +18,9 @@ public partial class Index : IDisposable
     private const int GridHeight = 20;
 
     private string _inputText = string.Empty;
-    private int _attemptsRemaining = 0;
-    
-    private bool _guessedRight = false;
+    private int _attemptsRemaining;
+    private bool _guessedRight;
+    private bool _gameOver;
     
     protected override async Task OnInitializedAsync()
     {
@@ -39,7 +40,7 @@ public partial class Index : IDisposable
 
     private void InitializeGrid()
     {
-        for (int i = 0; i < GridHeight; i++)
+        for (var i = 0; i < GridHeight; i++)
         {
             _characterGrid[i] = new char[GridWidth];
         }
@@ -61,7 +62,7 @@ public partial class Index : IDisposable
 
             _wordPlacements.Add(wordPlacement);
 
-            for (int i = 0; i < word.Length; i++)
+            for (var i = 0; i < word.Length; i++)
             {
                 _characterGrid[row][column + i] = word[i];
             }
@@ -73,9 +74,9 @@ public partial class Index : IDisposable
     private void FillGridWithRandomCharacters()
     {
         var possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
-        for (int i = 0; i < GridHeight; i++)
+        for (var i = 0; i < GridHeight; i++)
         {
-            for (int j = 0; j < GridWidth; j++)
+            for (var j = 0; j < GridWidth; j++)
             {
                 if (_characterGrid[i][j] == default)
                 {
@@ -102,8 +103,9 @@ public partial class Index : IDisposable
             word,
             _cancellationTokenSource.Token
         );
-        
-        
+
+        if (response.IsGameOver)
+            _gameOver = true;
         
         if (response.IsCorrect is false)
         {
@@ -112,8 +114,6 @@ public partial class Index : IDisposable
         }
 
         if (response.IsCorrect)
-        {
             _guessedRight = true;
-        }
     }
 }
