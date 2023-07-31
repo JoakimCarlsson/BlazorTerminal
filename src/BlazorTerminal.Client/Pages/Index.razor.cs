@@ -13,8 +13,8 @@ public partial class Index : IDisposable
     private readonly List<GridWord> _gridWords = new();
     private readonly List<string> _resultTexts = new();
 
-    private const int _gridWidth = 40;
-    private const int _gridHeight = 20;
+    private const int GridWidth = 40;
+    private const int GridHeight = 20;
 
     private string _inputText = string.Empty;
     private int _attemptsRemaining = 0;
@@ -39,9 +39,9 @@ public partial class Index : IDisposable
 
     private void InitializeGrid()
     {
-        for (int i = 0; i < _gridHeight; i++)
+        for (int i = 0; i < GridHeight; i++)
         {
-            _characterGrid[i] = new char[_gridWidth];
+            _characterGrid[i] = new char[GridWidth];
         }
     }
 
@@ -49,8 +49,8 @@ public partial class Index : IDisposable
     {
         foreach (var word in _gameSessionDetails.ScrambledWords)
         {
-            var row = _random.Next(0, _gridHeight);
-            var column = _random.Next(0, _gridWidth - word.Length);
+            var row = _random.Next(0, GridHeight);
+            var column = _random.Next(0, GridWidth - word.Length);
 
             var wordPlacement = new WordPlacement
             {
@@ -73,9 +73,9 @@ public partial class Index : IDisposable
     private void FillGridWithRandomCharacters()
     {
         var possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
-        for (int i = 0; i < _gridHeight; i++)
+        for (int i = 0; i < GridHeight; i++)
         {
-            for (int j = 0; j < _gridWidth; j++)
+            for (int j = 0; j < GridWidth; j++)
             {
                 if (_characterGrid[i][j] == default)
                 {
@@ -102,6 +102,8 @@ public partial class Index : IDisposable
             word,
             _cancellationTokenSource.Token
         );
+        
+        
         
         if (response.IsCorrect is false)
         {

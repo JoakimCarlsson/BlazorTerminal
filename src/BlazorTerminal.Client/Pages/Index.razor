@@ -12,13 +12,13 @@
         </div>
 
         <div class="word-grid">
-            @for (int i = 0; i < 20; i++)
+            @for (int i = 0; i < GridHeight; i++)
             {
                 <div class="word-row">
                     @{ var rowWords = _gridWords.Where(w => w.StartRow == i).OrderBy(w => w.StartColumn).ToList(); }
                     @{ int nextWordIndex = 0; }
 
-                    @for (int j = 0; j < _gridWidth; j++)
+                    @for (int j = 0; j < GridWidth; j++)
                     {
                         if (nextWordIndex < rowWords.Count && rowWords[nextWordIndex].StartColumn == j)
                         {
@@ -46,24 +46,4 @@
             <span> > @_inputText</span>
         </div>
     </div>
-    
-    <button @onclick="OpenDialog">Open Dialog</button>
-
-    <Dialog Title="Dialog Title" IsOpen="dialogIsOpen" IsOpenChanged="DialogIsOpenChanged">
-        <p>Some dialog content...</p>
-    </Dialog>
-}
-
-@code {
-    private bool dialogIsOpen = false;
-
-    void OpenDialog()
-    {
-        dialogIsOpen = true;
-    }
-
-    void DialogIsOpenChanged(bool isOpen)
-    {
-        dialogIsOpen = isOpen;
-    }
 }

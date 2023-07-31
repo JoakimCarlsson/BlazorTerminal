@@ -36,6 +36,15 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
 
         if (gameSession.Status != "In Progress") //TODO: use enum
             return TypedResults.BadRequest(); //TODO: return a more meaningful error message
+
+        if (gameSession.AttemptsRemaining == 0)
+            return TypedResults.Ok(new GuessedWordResponse(
+                false,
+                true,
+                model.Word,
+                0,
+                0
+            ));
         
         var likenessScore = CalculateLikenessScore(model.Word, gameSession.CurrentWord);
         if (likenessScore == gameSession.CurrentWord.Length)
@@ -45,6 +54,7 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
             
             return TypedResults.Ok(new GuessedWordResponse(
                 true,
+                false,
                 model.Word,
                 likenessScore,
                 gameSession.AttemptsRemaining
@@ -53,9 +63,10 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
         
         gameSession.AttemptsRemaining--;
         await UpdateGameSessionAsync(gameSession, cancellationToken);
-        
+
         return TypedResults.Ok(new GuessedWordResponse(
             false,
+            gameSession.AttemptsRemaining == 0,
             model.Word,
             likenessScore,
             gameSession.AttemptsRemaining
