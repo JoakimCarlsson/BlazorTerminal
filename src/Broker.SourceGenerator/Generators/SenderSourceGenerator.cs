@@ -10,7 +10,7 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
             {
                 using var nonGenericRequestSwitchCases = new StringWriter();
                 using var genericRequestSwitchCases = new StringWriter();
-                
+
                 foreach (var syntaxTree in compilation.SyntaxTrees)
                 {
                     var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -21,16 +21,16 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
                         genericRequestSwitchCases
                     );
                 }
-                
+
                 GenerateSenderClassFile(
-                    productionContext, 
-                    nonGenericRequestSwitchCases.ToString(), 
+                    productionContext,
+                    nonGenericRequestSwitchCases.ToString(),
                     genericRequestSwitchCases.ToString()
                 );
             });
     }
 
-    
+
     private void AppendSwitchCasesForSyntaxTree(
         SemanticModel semanticModel,
         IEnumerable<ClassDeclarationSyntax> classDeclarations,
@@ -40,9 +40,9 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
     {
         foreach (var classDeclaration in classDeclarations)
         {
-            if (semanticModel.GetDeclaredSymbol(classDeclaration) is not INamedTypeSymbol symbol) 
+            if (semanticModel.GetDeclaredSymbol(classDeclaration) is not INamedTypeSymbol symbol)
                 continue;
-            
+
             AppendSwitchCases(
                 symbol,
                 nonGenericRequestSwitchCases,
@@ -50,7 +50,7 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
             );
         }
     }
-    
+
     private void AppendSwitchCases(
         INamedTypeSymbol symbol,
         StringWriter nonGenericRequestSwitchCases,
@@ -65,18 +65,46 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
             var requestType = @interface.TypeArguments[0].ToString();
             if (@interface.TypeArguments.Length == 1)
             {
-                nonGenericIndentedWriter.WriteLine($"case {requestType} command: return _serviceProvider.GetRequiredService<IHandler<{requestType}>>().HandleAsync(command, cancellationToken);");
+                nonGenericIndentedWriter.WriteLine(
+                    $"case {requestType} command: return _serviceProvider.GetRequiredService<IHandler<{requestType}>>().HandleAsync(command, cancellationToken);");
             }
-            else if (@interface.TypeArguments.Length == 2)
+
+            if (@interface.TypeArguments.Length == 2)
             {
-                var responseType = @interface.TypeArguments[1].ToString();
+                var responseType = @interface.TypeArguments[1];
+                var responseTypeString = responseType.ToString();
+                
+                var isNullable = responseTypeString.EndsWith("?");
+
+                if (isNullable)
+                    responseTypeString = responseTypeString.TrimEnd('?');
+
                 genericIndentedWriter.Indent += 3;
                 genericIndentedWriter.WriteLine($"case {requestType} command:");
                 genericIndentedWriter.Indent++;
-                genericIndentedWriter.WriteLine($"if (typeof(TResponse) == typeof({responseType}))");
+                genericIndentedWriter.WriteLine($"if (typeof(TResponse) == typeof({responseTypeString}))");
                 genericIndentedWriter.OpenCodeBlock();
-                genericIndentedWriter.WriteLine($"var response =  await _serviceProvider.GetRequiredService<IHandler<{requestType}, {responseType}>>().HandleAsync(command, cancellationToken);");
-                genericIndentedWriter.WriteLine($"return System.Runtime.CompilerServices.Unsafe.As<{responseType}, TResponse>(ref response);");
+                genericIndentedWriter.WriteLine($"var handler = _serviceProvider.GetRequiredService<IHandler<{requestType}, {responseType}>>();");
+                genericIndentedWriter.WriteLine($"var task = handler.HandleAsync(command, cancellationToken);");
+                genericIndentedWriter.WriteLine($"await task;");
+                genericIndentedWriter.WriteLine($"var response = task.Result;");
+
+                if (isNullable)
+                {
+                    genericIndentedWriter.WriteLine("if (response != null)");
+                    genericIndentedWriter.OpenCodeBlock();
+                    genericIndentedWriter.WriteLine($"return System.Runtime.CompilerServices.Unsafe.As<{responseTypeString}, TResponse>(ref response);");
+                    genericIndentedWriter.CloseCodeBlock();
+                    genericIndentedWriter.WriteLine("else");
+                    genericIndentedWriter.OpenCodeBlock();
+                    genericIndentedWriter.WriteLine("return default(TResponse);");
+                    genericIndentedWriter.CloseCodeBlock();
+                }
+                else
+                {
+                    genericIndentedWriter.WriteLine($"return System.Runtime.CompilerServices.Unsafe.As<{responseTypeString}, TResponse>(ref response);");
+                }
+
                 genericIndentedWriter.CloseCodeBlock();
                 genericIndentedWriter.WriteLine("break;");
                 genericIndentedWriter.Indent--;
@@ -88,27 +116,28 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
         SourceProductionContext context,
         string nonGenericRequestSwitchCases,
         string genericRequestSwitchCases
-        )
+    )
     {
         var senderSource = $$"""
                              // <auto-generated />
-                             
+                             #nullable enable
+
                              using System;
                              using System.Threading.Tasks;
                              using System.Threading;
                              using Broker.Abstractions;
-                             
+
                              namespace Broker.SourceGenerator;
-                             
+
                              public class Sender : ISender
                              {
                                  private readonly IServiceProvider _serviceProvider;
-                         
+                             
                                  public Sender(IServiceProvider serviceProvider)
                                  {
                                      _serviceProvider = serviceProvider;
                                  }
-                         
+                             
                                  public Task SendAsync<TRequest>(TRequest request, CancellationToken cancellationToken = default)
                                      where TRequest : IRequest
                                  {
@@ -119,7 +148,7 @@ public sealed class SenderSourceGenerator : IIncrementalGenerator
                                              throw new InvalidOperationException($"No handler registered for type {request.GetType()}");
                                      }
                                  }
-                         
+                             
                                  public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
                                  {
                                      switch (request)
