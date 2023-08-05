@@ -9,6 +9,14 @@ internal static class GameEndpoints
             .WithTags("Game")
             .WithOpenApi();
 
+        endpointGroup.MapGet("/{GameId:guid}/guess", (
+                [AsParameters] GetGameSessionCommand command,
+                [FromServices] ISender sender,
+                CancellationToken cancellationToken
+            ) => sender.SendAsync(command, cancellationToken))
+            .WithName("Get Game Session")
+            .WithDescription("Gets the details of a game session");
+        
         endpointGroup.MapPost("/", (
                 [FromBody] CreateGameSessionCommand command,
                 [FromServices] ISender sender,

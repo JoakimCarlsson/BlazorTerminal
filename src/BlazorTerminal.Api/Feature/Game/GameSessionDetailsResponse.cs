@@ -1,4 +1,4 @@
-﻿namespace BlazorTerminal.Api.Feature.Game.Create;
+﻿namespace BlazorTerminal.Api.Feature.Game;
 
 internal sealed record GameSessionDetailsResponse(
     Guid Id,

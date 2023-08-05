@@ -55,10 +55,27 @@ internal sealed class
         FillGridWithWords(puzzleWords);
         FillGridWithRandomCharacters();
 
+        var gameboard = new GameBoard[GridHeight][];
+        for (var i = 0; i < GridHeight; i++)
+        {
+            gameboard[i] = new GameBoard[GridWidth];
+            for (var j = 0; j < GridWidth; j++)
+            {
+                gameboard[i][j] = new GameBoard
+                {
+                    Character = _board[i][j].Character,
+                    Word = _board[i][j].Word
+                };
+            }
+        }
         var gameSession = new GameSession(
             Guid.NewGuid(),
             puzzleWords[_random.Next(0, puzzleWords.Count)],
-            _board
+            _board.Select(row => row.Select(cell => new GameBoard
+            {
+                Character = cell.Character,
+                Word = cell.Word
+            }).ToArray()).ToArray()
         )
         {
             AttemptsRemaining = 5,
