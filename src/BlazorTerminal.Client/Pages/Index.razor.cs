@@ -10,7 +10,7 @@ public partial class Index : IDisposable
 
     private readonly List<string> _resultTexts = new();
     
-    private string _inputText = string.Empty;
+    private string _hoveredText = string.Empty;
     private int _attemptsRemaining;
     private bool _guessedRight;
     private bool _gameOver;
@@ -34,7 +34,7 @@ public partial class Index : IDisposable
 
     private void ShowHoveredText(string text)
     {
-        _inputText = text;
+        _hoveredText = text;
     }
 
     private async Task GuessWordAsync(string word)

@@ -25,6 +25,12 @@
     cursor: pointer;
 }
 
+.hovered {
+    background-color: #296f3a;
+    color: #15160c;
+    cursor: pointer;
+}
+
 .attempts-bar {
     display: flex;
     align-items: start;
