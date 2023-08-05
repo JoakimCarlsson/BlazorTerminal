@@ -2,8 +2,8 @@
 
 internal sealed record GameSession(
     Guid Id,
-    string CurrentWord,
-    IEnumerable<string> ScrambledWords
+    string CorrectWord,
+    Cell[][] Board
 )
 {
     public int AttemptsRemaining { get; set; }

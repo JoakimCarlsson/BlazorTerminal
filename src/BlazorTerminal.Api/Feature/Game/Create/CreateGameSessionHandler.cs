@@ -10,24 +10,31 @@ internal enum GameDifficulty
 }
 
 internal sealed class
-    CreateGameSessionHandler : IHandler<CreateGameSessionCommand, Results<Created<GameSessionDetailsResponse>, BadRequest>>
+    CreateGameSessionHandler : IHandler<CreateGameSessionCommand,
+        Results<Created<GameSessionDetailsResponse>, BadRequest>>
 {
     private readonly IGameSessionsRepository _gameSessionsRepository;
     private readonly IDistributedCache _distributedCache;
     private readonly Random _random = new();
-    
+
+    private const int GridWidth = 40;
+    private const int GridHeight = 20;
+
+    private readonly Cell[][] _board = new Cell[GridHeight][];
+    private readonly char[] _possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
+
     private readonly List<string> _words = new()
     {
-        "DUST", "WISP", "FLAT", "RAIN", "TINT", "BOLD", "ARCH", "PEAK", "MASK", "GLOW", 
+        "DUST", "WISP", "FLAT", "RAIN", "TINT", "BOLD", "ARCH", "PEAK", "MASK", "GLOW",
         "CHIP", "JAZZ", "ZONE", "ECHO", "MUTE", "COIL", "QUIZ", "KNOT", "HUSH", "DAZE",
-        
-        "SCRIBE", "PROPEL", "JIGSAW", "LEGACY", "BOTTLE", "SUMMIT", "KITTEN", "BISHOP", "BINARY", "AMULET", 
+
+        "SCRIBE", "PROPEL", "JIGSAW", "LEGACY", "BOTTLE", "SUMMIT", "KITTEN", "BISHOP", "BINARY", "AMULET",
         "OPTICS", "PHOBIA", "GRAVEL", "PRIMAL", "STROBE", "CHROME", "VECTOR", "RITUAL", "FIZZLE", "WIDGET",
-        
+
         "ELEPHANT", "TRINKETS", "MONOPOLY", "DORMITORY", "BLUEPRINT", "THEMATICS", "BOOKMARK", "PROLIFIC", "ANTIVIRUS", "AQUEDUCT",
         "NARRATIVE", "HANGOVER", "GLYCERIN", "MANIFEST", "POSITIVE", "MOMENTUM", "OUTRIDER", "PARABOLIC", "SCAFFOLD", "TURBINES"
     };
-    
+
     public CreateGameSessionHandler(
         IGameSessionsRepository gameSessionsRepository,
         IDistributedCache distributedCache
@@ -37,48 +44,106 @@ internal sealed class
         _distributedCache = distributedCache;
     }
 
-    public async Task<Results<Created<GameSessionDetailsResponse>, BadRequest>> HandleAsync(CreateGameSessionCommand request,
-        CancellationToken cancellationToken = default)
+    public async Task<Results<Created<GameSessionDetailsResponse>, BadRequest>> HandleAsync(
+        CreateGameSessionCommand request,
+        CancellationToken cancellationToken = default
+    )
     {
-        var scrambledWords = GenerateWords(10, 5).ToList();
+        InitializeGrid();
+        var puzzleWords = GetPuzzleWords(request.GameDifficulty).ToList();
+
+        FillGridWithWords(puzzleWords);
+        FillGridWithRandomCharacters();
 
         var gameSession = new GameSession(
             Guid.NewGuid(),
-            scrambledWords.ElementAt(_random.Next(0, scrambledWords.Count())),
-            scrambledWords
+            puzzleWords[_random.Next(0, puzzleWords.Count)],
+            _board
         )
         {
             AttemptsRemaining = 5,
             Status = "In Progress"
         };
 
-        var createdSession = await _gameSessionsRepository.CreateAsync(gameSession, cancellationToken);
-
+        await _gameSessionsRepository.CreateAsync(gameSession, cancellationToken);
         await _distributedCache.SetAsync(
-            createdSession.Id.ToString(),
-            createdSession,
+            gameSession.Id.ToString(),
+            gameSession,
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             },
             cancellationToken);
-
+        
         return TypedResults.Created(
-            $"api/game/{createdSession.Id}",
+            $"api/game/{gameSession.Id}",
             new GameSessionDetailsResponse(
-                createdSession.Id,
-                createdSession.ScrambledWords,
-                createdSession.AttemptsRemaining
-            )
-        );
+                gameSession.Id,
+                _board,
+                gameSession.AttemptsRemaining
+            ));
     }
 
-    //get a list of words from somewhere else :-)
-    private IEnumerable<string> GenerateWords(int wordCount, int wordLength)
+    private void InitializeGrid()
     {
-        var allWords = GetWords();
+        for (var i = 0; i < GridHeight; i++)
+        {
+            _board[i] = new Cell[GridWidth];
+            for (var j = 0; j < GridWidth; j++)
+            {
+                _board[i][j] = new Cell { Character = default, Word = default };
+            }
+        }
+    }
 
-        var suitableWords = allWords.Where(word => word.Length == wordLength).ToList();
+    private void FillGridWithWords(IEnumerable<string> words)
+    {
+        foreach (var word in words)
+        {
+            var row = _random.Next(0, GridHeight);
+            var column = _random.Next(0, GridWidth - word.Length);
+
+            for (var i = 0; i < word.Length; i++)
+            {
+                _board[row][column + i].Character = word[i];
+                _board[row][column + i].Word = word;
+            }
+        }
+    }
+
+    private void FillGridWithRandomCharacters()
+    {
+        for (var i = 0; i < GridHeight; i++)
+        {
+            for (var j = 0; j < GridWidth; j++)
+            {
+                if (_board[i][j].Character == default)
+                {
+                    _board[i][j].Character = _possibleCharacters[_random.Next(0, _possibleCharacters.Length)];
+                }
+            }
+        }
+    }
+
+    private IEnumerable<string> GetPuzzleWords(GameDifficulty difficulty)
+    {
+        var wordLength = difficulty switch
+        {
+            GameDifficulty.Easy => 4,
+            GameDifficulty.Medium => 6,
+            GameDifficulty.Hard => 8,
+            _ => throw new ArgumentOutOfRangeException(nameof(difficulty), difficulty, "Invalid game level")
+        };
+
+        var wordCount = difficulty switch
+        {
+            GameDifficulty.Easy => 8,
+            GameDifficulty.Medium => 10,
+            GameDifficulty.Hard => 12,
+            _ => throw new ArgumentOutOfRangeException(nameof(difficulty), difficulty, "Invalid game level")
+        };
+
+        var suitableWords = _words.Where(word => word.Length == wordLength).ToList();
 
         var selectedWords = new List<string>();
         for (var i = 0; i < wordCount; i++)
@@ -89,19 +154,5 @@ internal sealed class
         }
 
         return selectedWords;
-    }
-
-    private IEnumerable<string> GetWords()
-    {
-        return new List<string>
-        {
-            "ABOUT", "AFTER", "APPLE", "ARISE", "BASIC", "BLAME", "BRICK", "CHAIR", "CHIEF", "CHILD",
-            "CLAIM", "CLASS", "CLEAR", "CLOCK", "COULD", "CROSS", "DANCE", "DRINK", "EARTH", "EIGHT",
-            "EQUAL", "ERROR", "FINAL", "FIRST", "FIXED", "FLAME", "FRESH", "FRUIT", "GLASS", "GUESS",
-            "HEART", "HUMAN", "INDEX", "ISSUE", "JUDGE", "KNIFE", "LEARN", "LEGAL", "LEVEL", "LOWER",
-            "MAGIC", "MAJOR", "MIGHT", "NEVER", "NOISE", "OCCUR", "OTHER", "POWER", "QUICK", "RIVER",
-            "SCALE", "SILENCE", "SINCE", "SWEET", "THANK", "THEIR", "THIRD", "THOSE", "UNDER", "USAGE",
-            "VALUE", "VIDEO", "WATCH", "WORLD", "WORTH", "YOUTH", "ZEBRA", "ALLOW", "ALONG", "BELOW"
-        };
     }
 }

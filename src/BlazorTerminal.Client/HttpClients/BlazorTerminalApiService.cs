@@ -17,10 +17,12 @@ internal class BlazorTerminalApiService
     internal async Task<GameSessionDetailsResponse?> InitializeGameSessionAsync(
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsync(
+        var response = await _httpClient.PostAsJsonAsync(
             "/api/game",
-            null,
-            cancellationToken
+            new
+            {
+                GameDifficulty = 0
+            }, JsonSerializerOptions,cancellationToken
         );
 
         if (!response.IsSuccessStatusCode)
@@ -28,7 +30,7 @@ internal class BlazorTerminalApiService
 
         return await response.Content.ReadFromJsonAsync<GameSessionDetailsResponse>(
             JsonSerializerOptions,
-            cancellationToken: cancellationToken
+            cancellationToken
         );
     }
 
@@ -41,7 +43,7 @@ internal class BlazorTerminalApiService
         var response = await _httpClient.PostAsJsonAsync($"/api/game/{id}/guess", new
         {
             Word = word
-        }, JsonSerializerOptions, cancellationToken: cancellationToken);
+        }, JsonSerializerOptions, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             return null;

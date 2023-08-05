@@ -8,15 +8,8 @@ public partial class Index : IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private GameSessionDetailsResponse? _gameSessionDetails;
 
-    private readonly Random _random = new();
-    private readonly char[][] _characterGrid = new char[20][];
-    private readonly List<WordPlacement> _wordPlacements = new();
-    private readonly List<GridWord> _gridWords = new();
     private readonly List<string> _resultTexts = new();
-
-    private const int GridWidth = 40;
-    private const int GridHeight = 20;
-
+    
     private string _inputText = string.Empty;
     private int _attemptsRemaining;
     private bool _guessedRight;
@@ -32,58 +25,6 @@ public partial class Index : IDisposable
             return;
         
         _attemptsRemaining = _gameSessionDetails.AttemptsRemaining;
-        
-        InitializeGrid();
-        FillGridWithWords();
-        FillGridWithRandomCharacters();
-    }
-
-    private void InitializeGrid()
-    {
-        for (var i = 0; i < GridHeight; i++)
-        {
-            _characterGrid[i] = new char[GridWidth];
-        }
-    }
-
-    private void FillGridWithWords()
-    {
-        foreach (var word in _gameSessionDetails.ScrambledWords)
-        {
-            var row = _random.Next(0, GridHeight);
-            var column = _random.Next(0, GridWidth - word.Length);
-
-            var wordPlacement = new WordPlacement
-            {
-                Word = word,
-                StartRow = row,
-                StartColumn = column
-            };
-
-            _wordPlacements.Add(wordPlacement);
-
-            for (var i = 0; i < word.Length; i++)
-            {
-                _characterGrid[row][column + i] = word[i];
-            }
-
-            _gridWords.Add(new GridWord { Placement = wordPlacement });
-        }
-    }
-
-    private void FillGridWithRandomCharacters()
-    {
-        var possibleCharacters = ".,!@#$%^&*()-_=+[]{}|;:'\"/?<>`~".ToCharArray();
-        for (var i = 0; i < GridHeight; i++)
-        {
-            for (var j = 0; j < GridWidth; j++)
-            {
-                if (_characterGrid[i][j] == default)
-                {
-                    _characterGrid[i][j] = possibleCharacters[_random.Next(0, possibleCharacters.Length)];
-                }
-            }
-        }
     }
 
     public void Dispose()
