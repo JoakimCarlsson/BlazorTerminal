@@ -14,13 +14,33 @@ internal class BlazorTerminalApiService
         _httpClient = httpClient;
     }
 
-    internal async Task<GameSessionDetailsResponse?> InitializeGameSessionAsync(
-        CancellationToken cancellationToken = default)
+    internal async Task<GameSessionDetailsResponse?> GetGameSessionAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+        )
     {
-        var response = await _httpClient.PostAsync(
-            "/api/game",
-            null,
+        var response = await _httpClient.GetAsync($"/api/game/{id}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<GameSessionDetailsResponse>(
+            JsonSerializerOptions,
             cancellationToken
+        );
+    }
+    
+    internal async Task<GameSessionDetailsResponse?> InitializeGameSessionAsync(
+        GameDifficulty difficulty,
+        CancellationToken cancellationToken = default
+        )
+    {
+        var response = await _httpClient.PostAsJsonAsync(
+            "/api/game",
+            new
+            {
+                GameDifficulty = (int)difficulty
+            }, JsonSerializerOptions,cancellationToken
         );
 
         if (!response.IsSuccessStatusCode)
@@ -28,7 +48,7 @@ internal class BlazorTerminalApiService
 
         return await response.Content.ReadFromJsonAsync<GameSessionDetailsResponse>(
             JsonSerializerOptions,
-            cancellationToken: cancellationToken
+            cancellationToken
         );
     }
 
@@ -41,7 +61,7 @@ internal class BlazorTerminalApiService
         var response = await _httpClient.PostAsJsonAsync($"/api/game/{id}/guess", new
         {
             Word = word
-        }, JsonSerializerOptions, cancellationToken: cancellationToken);
+        }, JsonSerializerOptions, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             return null;

@@ -8,14 +8,23 @@ internal static class GameEndpoints
             .MapGroup("/api/game")
             .WithTags("Game")
             .WithOpenApi();
+
+        endpointGroup.MapGet("/{GameId:guid}", (
+                [AsParameters] GetGameSessionCommand command,
+                [FromServices] ISender sender,
+                CancellationToken cancellationToken
+            ) => sender.SendAsync(command, cancellationToken))
+            .WithName("Get Game Session")
+            .WithDescription("Gets the details of a game session");
         
         endpointGroup.MapPost("/", (
-            [FromServices] ISender sender,
-            CancellationToken cancellationToken
-        ) => sender.SendAsync(new CreateGameCommand(), cancellationToken))
+                [FromBody] CreateGameSessionCommand command,
+                [FromServices] ISender sender,
+                CancellationToken cancellationToken
+            ) => sender.SendAsync(command, cancellationToken))
             .WithName("Start Game Session")
             .WithDescription("Starts a new game session");
-        
+
         endpointGroup.MapPost("/{GameId:guid}/guess", (
                 [AsParameters] GuessWordCommand command,
                 [FromServices] ISender sender,

@@ -2,6 +2,13 @@
 
 internal sealed record GameSessionDetailsResponse(
     Guid Id,
-    IEnumerable<string> ScrambledWords,
-    int AttemptsRemaining
+    CellResponse[][] Board,
+    int AttemptsRemaining, 
+    string Status //use enum
 );
+
+internal sealed class CellResponse
+{
+    public char Character { get; set; }
+    public string? Word { get; set; }
+}
