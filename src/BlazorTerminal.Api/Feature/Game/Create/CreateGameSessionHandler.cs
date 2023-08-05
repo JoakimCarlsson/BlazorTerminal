@@ -1,14 +1,34 @@
 ﻿namespace BlazorTerminal.Api.Feature.Game.Create;
 
-internal sealed record CreateGameCommand : IRequest<Results<Created<GameSessionDetailsResponse>, BadRequest>>;
+internal sealed record CreateGameSessionCommand(GameDifficulty GameDifficulty) : IRequest<Results<Created<GameSessionDetailsResponse>, BadRequest>>;
+
+internal enum GameDifficulty
+{
+    Easy,
+    Medium,
+    Hard
+}
 
 internal sealed class
-    CreateGameHandler : IHandler<CreateGameCommand, Results<Created<GameSessionDetailsResponse>, BadRequest>>
+    CreateGameSessionHandler : IHandler<CreateGameSessionCommand, Results<Created<GameSessionDetailsResponse>, BadRequest>>
 {
     private readonly IGameSessionsRepository _gameSessionsRepository;
     private readonly IDistributedCache _distributedCache;
-
-    public CreateGameHandler(
+    private readonly Random _random = new();
+    
+    private readonly List<string> _words = new()
+    {
+        "DUST", "WISP", "FLAT", "RAIN", "TINT", "BOLD", "ARCH", "PEAK", "MASK", "GLOW", 
+        "CHIP", "JAZZ", "ZONE", "ECHO", "MUTE", "COIL", "QUIZ", "KNOT", "HUSH", "DAZE",
+        
+        "SCRIBE", "PROPEL", "JIGSAW", "LEGACY", "BOTTLE", "SUMMIT", "KITTEN", "BISHOP", "BINARY", "AMULET", 
+        "OPTICS", "PHOBIA", "GRAVEL", "PRIMAL", "STROBE", "CHROME", "VECTOR", "RITUAL", "FIZZLE", "WIDGET",
+        
+        "ELEPHANT", "TRINKETS", "MONOPOLY", "DORMITORY", "BLUEPRINT", "THEMATICS", "BOOKMARK", "PROLIFIC", "ANTIVIRUS", "AQUEDUCT",
+        "NARRATIVE", "HANGOVER", "GLYCERIN", "MANIFEST", "POSITIVE", "MOMENTUM", "OUTRIDER", "PARABOLIC", "SCAFFOLD", "TURBINES"
+    };
+    
+    public CreateGameSessionHandler(
         IGameSessionsRepository gameSessionsRepository,
         IDistributedCache distributedCache
     )
@@ -17,15 +37,14 @@ internal sealed class
         _distributedCache = distributedCache;
     }
 
-    public async Task<Results<Created<GameSessionDetailsResponse>, BadRequest>> HandleAsync(CreateGameCommand request,
+    public async Task<Results<Created<GameSessionDetailsResponse>, BadRequest>> HandleAsync(CreateGameSessionCommand request,
         CancellationToken cancellationToken = default)
     {
-        var random = new Random();
         var scrambledWords = GenerateWords(10, 5).ToList();
 
         var gameSession = new GameSession(
             Guid.NewGuid(),
-            scrambledWords.ElementAt(random.Next(0, scrambledWords.Count())),
+            scrambledWords.ElementAt(_random.Next(0, scrambledWords.Count())),
             scrambledWords
         )
         {
@@ -60,12 +79,11 @@ internal sealed class
         var allWords = GetWords();
 
         var suitableWords = allWords.Where(word => word.Length == wordLength).ToList();
-        var random = new Random();
 
         var selectedWords = new List<string>();
         for (var i = 0; i < wordCount; i++)
         {
-            var randomIndex = random.Next(suitableWords.Count);
+            var randomIndex = _random.Next(suitableWords.Count);
             selectedWords.Add(suitableWords[randomIndex]);
             suitableWords.RemoveAt(randomIndex);
         }
