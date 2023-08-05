@@ -14,14 +14,32 @@ internal class BlazorTerminalApiService
         _httpClient = httpClient;
     }
 
+    internal async Task<GameSessionDetailsResponse?> GetGameSessionAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+        )
+    {
+        var response = await _httpClient.GetAsync($"/api/game/{id}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<GameSessionDetailsResponse>(
+            JsonSerializerOptions,
+            cancellationToken
+        );
+    }
+    
     internal async Task<GameSessionDetailsResponse?> InitializeGameSessionAsync(
-        CancellationToken cancellationToken = default)
+        GameDifficulty difficulty,
+        CancellationToken cancellationToken = default
+        )
     {
         var response = await _httpClient.PostAsJsonAsync(
             "/api/game",
             new
             {
-                GameDifficulty = 0
+                GameDifficulty = (int)difficulty
             }, JsonSerializerOptions,cancellationToken
         );
 

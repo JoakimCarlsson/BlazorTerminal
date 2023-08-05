@@ -2,6 +2,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddBroker();
+builder.Services.AddSingleton<GameSessionStore>();
+
 var retryPolicy = HttpPolicyExtensions
     .HandleTransientHttpError()
     .OrResult(response => response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)

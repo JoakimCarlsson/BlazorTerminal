@@ -39,8 +39,8 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
         
         if (gameSession.AttemptsRemaining == 0)
             return TypedResults.Ok(new GuessedWordResponse(
-                false,
-                true,
+                gameSession.Status == "Completed",
+                gameSession.AttemptsRemaining == 0,
                 model.Word,
                 0,
                 0

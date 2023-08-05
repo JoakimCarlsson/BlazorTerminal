@@ -9,7 +9,7 @@ internal static class GameEndpoints
             .WithTags("Game")
             .WithOpenApi();
 
-        endpointGroup.MapGet("/{GameId:guid}/guess", (
+        endpointGroup.MapGet("/{GameId:guid}", (
                 [AsParameters] GetGameSessionCommand command,
                 [FromServices] ISender sender,
                 CancellationToken cancellationToken

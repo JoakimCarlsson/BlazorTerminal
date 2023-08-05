@@ -1,56 +1,7 @@
 ﻿@page "/"
 
-<div class="game-container">
-    @if (_gameSessionDetails is not null &&
-         _guessedRight is false &&
-         _gameOver is false)
-    {
-        <div class="attempts-bar">
-            <span class="attempts-label">Attempts Remaining: </span>
-            @for (int i = 0; i < _attemptsRemaining; i++)
-            {
-                <span class="attempt">■</span>
-            }
-        </div>
-
-
-        <div class="word-grid">
-            @for (int i = 0; i < _gameSessionDetails.Board.GetLength(0); i++)
-            {
-                <div class="word-row">
-                    @for (int j = 0; j < _gameSessionDetails.Board[0].GetLength(0); j++)
-                    {
-                        var cell = _gameSessionDetails.Board[i][j];
-                        var onClickEvent = cell.Word is null
-                            ? EventCallback.Factory.Create(this, () => { })
-                            : EventCallback.Factory.Create(this, () => GuessWordAsync(cell.Word));
-
-                        var onHoverEvent = EventCallback.Factory.Create(this, () => ShowHoveredText(cell.Word ?? ""));
-
-                        var cssClass = cell.Word == _hoveredText ? "word-char hovered" : "word-char";
-
-                        <span class="@cssClass" @onmouseover="onHoverEvent" @onclick="onClickEvent">@cell.Character</span>
-                    }
-                </div>
-            }
-        </div>
-
-        <div class="guess-input">
-            @foreach (var text in _resultTexts)
-            {
-                <span> > @text</span>
-            }
-            <span> > @_hoveredText</span>
-        </div>
-    }
-
-    @if (_guessedRight)
-    {
-        <div>:)</div>
-    }
-
-    @if (_gameOver)
-    {
-        <div>:(</div>
-    }
+<div class="difficulty-menu">
+    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Easy)">EASY</button>
+    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Medium)">MEDIUM</button>
+    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Hard)">HARD</button>
 </div>
