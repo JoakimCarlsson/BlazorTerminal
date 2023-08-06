@@ -4,6 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +13,12 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.8" />
         <ProjectReference Include="..\Broker.Abstractions\Broker.Abstractions.csproj" />
         <ProjectReference Include="..\Broker.SourceGenerator\Broker.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
     
 </Project>
