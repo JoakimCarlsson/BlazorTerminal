@@ -6,6 +6,7 @@ on:
     branches:
       - feature/ci-cd
     paths:
+      - ".github/workflows/azure-static-web-apps-delightful-wave-0f6b91603.yml"
       - "src/BlazorTerminal.Client/**"
       - "src/Broker.Abstractions/**"
       - "src/Broker.SourceGenerator/**"

@@ -1,16 +1,15 @@
 name: Trigger auto deployment for ca-blazorterminal-dev
 
-# When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
   push:
     branches: 
       [ feature/ci-cd ]
     paths:
-    - '**'
-    - '.github/workflows/ca-blazorterminal-dev-AutoDeployTrigger-886d603a-159b-4f77-851e-bf7a243cf3d2.yml'
+    - ".github/workflows/ca-blazorterminal-dev-AutoDeployTrigger-886d603a-159b-4f77-851e-bf7a243cf3d2.yml"
+    - "src/BlazorTerminal.Api/**"
+    - "src/Broker.Abstractions/**"
+    - "src/Broker.SourceGenerator/**"
 
-  # Allow mannually trigger 
   workflow_dispatch:
       
 jobs:
@@ -22,13 +21,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v1.4.3
         with:
           creds: ${{ secrets.CABLAZORTERMINALDEV_AZURE_CREDENTIALS }}
 
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v1
         with:
+          dockerfilePath: src/BlazorTerminal.Api/Dockerfile
           appSourcePath: ${{ github.workspace }} 
           registryUrl: crblazorterminaldev.azurecr.io
           registryUsername: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }}
@@ -36,7 +36,3 @@ jobs:
           containerAppName: ca-blazorterminal-dev
           resourceGroup: rg-blazorterminal
           imageToBuild: crblazorterminaldev.azurecr.io/ca-blazorterminal-dev:${{ github.sha }}
-          
-
-     
-
