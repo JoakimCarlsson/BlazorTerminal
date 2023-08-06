@@ -8,7 +8,7 @@ internal sealed class CosmosInitializationService : BackgroundService
     public CosmosInitializationService(
         CosmosClient cosmosClient,
         ILogger<CosmosInitializationService> logger
-        )
+    )
     {
         _cosmosClient = cosmosClient;
         _logger = logger;
@@ -16,34 +16,26 @@ internal sealed class CosmosInitializationService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
-        {
-            var partitionKeyPath = $"/{nameof(GameSession.Id).ToLower()}";
+        var partitionKeyPath = $"/{nameof(GameSession.Id).ToLower()}";
 
-            var containerProperties = new ContainerProperties(CosmosGlobals.GameSessionContainerName, partitionKeyPath)
+        var containerProperties = new ContainerProperties(CosmosGlobals.GameSessionContainerName, partitionKeyPath)
+        {
+            IndexingPolicy = new IndexingPolicy
             {
-                IndexingPolicy = new IndexingPolicy
-                {
-                    Automatic = true,
-                    IndexingMode = IndexingMode.Consistent,
-                    ExcludedPaths = { new ExcludedPath { Path = "/*" } }
-                }
-            };
+                Automatic = true,
+                IndexingMode = IndexingMode.Consistent,
+                ExcludedPaths = { new ExcludedPath { Path = "/*" } }
+            }
+        };
 
-            var database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(
-                CosmosGlobals.DatabaseName,
-                cancellationToken: stoppingToken
-            );
+        var database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(
+            CosmosGlobals.DatabaseName,
+            cancellationToken: stoppingToken
+        );
 
-            await database.Database.CreateContainerIfNotExistsAsync(
-                containerProperties,
-                cancellationToken: stoppingToken
-            );
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error initializing Cosmos DB: {Message}", e.Message);
-            throw;
-        }
+        await database.Database.CreateContainerIfNotExistsAsync(
+            containerProperties,
+            cancellationToken: stoppingToken
+        );
     }
 }
