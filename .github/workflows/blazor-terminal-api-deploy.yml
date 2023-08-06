@@ -5,7 +5,7 @@ on:
     branches:
       [ feature/ci-cd ]
     paths:
-      - ".github/workflows/ca-blazorterminal-dev-AutoDeployTrigger-886d603a-159b-4f77-851e-bf7a243cf3d2.yml"
+      - ".github/workflows/blazor-terminal-api-deploy.yml"
       - "src/BlazorTerminal.Api/**"
       - "src/Broker.Abstractions/**"
       - "src/Broker.SourceGenerator/**"
