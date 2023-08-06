@@ -16,7 +16,11 @@ var circuitBreakerPolicy = HttpPolicyExtensions
 
 builder.Services.AddHttpClient<BlazorTerminalApiService>(client =>
     {
-        client.BaseAddress = new Uri("http://localhost:5278");
+        var baseAddress = builder.Configuration.GetValue<string>("apiBaseUrl");
+        if (string.IsNullOrWhiteSpace(baseAddress))
+            throw new ArgumentNullException(baseAddress, "apiBaseUrl is not set in appsettings.json");
+        
+        client.BaseAddress = new Uri(baseAddress);
     })
     .AddPolicyHandler(retryPolicy)
     .AddPolicyHandler(circuitBreakerPolicy);
