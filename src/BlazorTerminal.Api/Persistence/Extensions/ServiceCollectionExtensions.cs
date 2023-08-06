@@ -26,9 +26,16 @@ internal static class ServiceCollectionExtensions
 
     internal static IServiceCollection AddCosmosDb(
         this IServiceCollection serviceCollection, 
-        string connectionString
+        IConfiguration configuration
     )
     {
+        var connectionString = Environment.GetEnvironmentVariable("AZURE_COSMOS_CONNECTIONSTRING");
+        if (string.IsNullOrEmpty(connectionString))
+            connectionString = configuration.GetValue<string>("AzureCosmosConnectionString");
+
+        if (string.IsNullOrEmpty(connectionString))
+            throw new ArgumentNullException(nameof(connectionString), "No connection string provided for Cosmos DB.");
+
         serviceCollection.CosmosClientInitialization(connectionString);
         serviceCollection.AddHostedService<CosmosInitializationService>();
 
