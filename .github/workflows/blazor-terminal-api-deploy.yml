@@ -2,16 +2,16 @@ name: Trigger auto deployment for ca-blazorterminal-dev
 
 on:
   push:
-    branches: 
-      [ feature/ci-cd ]
+    branches:
+      [ main ]
     paths:
-    - ".github/workflows/ca-blazorterminal-dev-AutoDeployTrigger-886d603a-159b-4f77-851e-bf7a243cf3d2.yml"
-    - "src/BlazorTerminal.Api/**"
-    - "src/Broker.Abstractions/**"
-    - "src/Broker.SourceGenerator/**"
+      - ".github/workflows/ca-blazorterminal-dev-AutoDeployTrigger-886d603a-159b-4f77-851e-bf7a243cf3d2.yml"
+      - "src/BlazorTerminal.Api/**"
+      - "src/Broker.Abstractions/**"
+      - "src/Broker.SourceGenerator/**"
 
   workflow_dispatch:
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
         uses: azure/container-apps-deploy-action@v1
         with:
           dockerfilePath: src/BlazorTerminal.Api/Dockerfile
-          appSourcePath: ${{ github.workspace }} 
+          appSourcePath: ${{ github.workspace }}
           registryUrl: crblazorterminaldev.azurecr.io
           registryUsername: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}

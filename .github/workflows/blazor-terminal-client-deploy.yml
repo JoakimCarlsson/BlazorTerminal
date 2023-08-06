@@ -1,15 +1,16 @@
 name: Blazor Terminal Client CI / CD
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - feature/ci-cd
+      [ main ]
     paths:
       - ".github/workflows/azure-static-web-apps-delightful-wave-0f6b91603.yml"
       - "src/BlazorTerminal.Client/**"
       - "src/Broker.Abstractions/**"
       - "src/Broker.SourceGenerator/**"
+
+  workflow_dispatch:
 
 jobs:
   build_and_deploy_job:
