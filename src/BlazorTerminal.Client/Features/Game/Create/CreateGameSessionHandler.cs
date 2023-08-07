@@ -24,7 +24,7 @@ internal class CreateGameSessionHandler : IHandler<CreateGameSessionCommand>
         CancellationToken cancellationToken = default
         )
     {
-        _gameSessionStore.SetState(GameSessionState.Initializing());
+        _gameSessionStore.SetState(_gameSessionStore.State with { IsLoading = true });
         
         var response = await _blazorTerminalApiService.InitializeGameSessionAsync(
             request.Difficulty,

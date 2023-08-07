@@ -1,7 +1,14 @@
 ﻿@page "/"
 
-<div class="difficulty-menu">
-    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Easy)">EASY</button>
-    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Medium)">MEDIUM</button>
-    <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Hard)">HARD</button>
-</div>
+@if (GameSessionState.IsLoading)
+{
+    <LoadingIndicator/>
+}
+else
+{
+    <div class="difficulty-menu">
+        <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Easy)">EASY</button>
+        <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Medium)">MEDIUM</button>
+        <button class="button" @onclick="() => CreateGameSessionAsync(GameDifficulty.Hard)">HARD</button>
+    </div>
+}

@@ -17,7 +17,7 @@ internal sealed record GameSessionState(
             Guid.Empty,
             Array.Empty<Cell[]>(),
             0,
-            true,
+            false,
             false,
             false,
             new List<string>()

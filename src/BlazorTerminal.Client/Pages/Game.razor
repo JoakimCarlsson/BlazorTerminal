@@ -1,7 +1,11 @@
 ﻿@page "/game/{id}"
 
 <div class="game-container">
-    @if (GameSessionState.IsLoading is false &&
+    @if (GameSessionState.IsLoading)
+    {
+        <LoadingIndicator/>
+    }
+    else if (GameSessionState.IsLoading is false &&
          GameSessionState.IsGameOver is false &&
          GameSessionState.IsGameWon is false)
     {
