@@ -3,7 +3,7 @@ name: Blazor Terminal Client CI / CD
 on:
   push:
     branches:
-      [ feature/ci-cd ]
+      [ main ]
     paths:
       - ".github/workflows/blazor-terminal-client-deploy.yml"
       - "src/BlazorTerminal.Client/**"

@@ -3,7 +3,7 @@ name: Trigger auto deployment for ca-blazorterminal-dev
 on:
   push:
     branches:
-      [ feature/ci-cd ]
+      [ main ]
     paths:
       - ".github/workflows/blazor-terminal-api-deploy.yml"
       - "src/BlazorTerminal.Api/**"
