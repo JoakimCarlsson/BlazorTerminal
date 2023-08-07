@@ -1,4 +1,6 @@
-﻿global using System.Net;
+﻿global using Azure.Identity;
+
+global using System.Net;
 global using System.Text.Json;
 
 global using BlazorTerminal.Api.Persistence.Entites;
@@ -13,6 +15,7 @@ global using BlazorTerminal.Api.Feature.Game.Get;
 
 global using BlazorTerminal.Api.Extensions;
 
+global using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Azure.Cosmos;
