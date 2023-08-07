@@ -117,8 +117,23 @@ internal sealed class
     {
         foreach (var word in words)
         {
-            var row = _random.Next(0, GridHeight);
-            var column = _random.Next(0, GridWidth - word.Length);
+            bool hasOverlap;
+            int row, column;
+            do
+            {
+                hasOverlap = false;
+                row = _random.Next(0, GridHeight);
+                column = _random.Next(0, GridWidth - word.Length);
+
+                for (var i = 0; i < word.Length; i++)
+                {
+                    if (_board[row][column + i].Character == default) 
+                        continue;
+                    
+                    hasOverlap = true;
+                    break;
+                }
+            } while (hasOverlap);
 
             for (var i = 0; i < word.Length; i++)
             {
