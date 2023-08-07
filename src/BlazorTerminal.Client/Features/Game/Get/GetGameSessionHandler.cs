@@ -19,7 +19,8 @@ internal sealed class GetGameSessionHandler : IHandler<GetGameSessionCommand>
     
     public async Task HandleAsync(GetGameSessionCommand request, CancellationToken cancellationToken = default)
     {
-        _gameSessionStore.SetState(GameSessionState.Initializing());
+        _gameSessionStore.SetState(_gameSessionStore.State with { IsLoading = true });
+        
         var response = await _blazorTerminalApiService.GetGameSessionAsync(request.Id, cancellationToken);
         if(response is null)
             return; //do something here, if 404, not found if error etc. 
