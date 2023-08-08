@@ -6,37 +6,15 @@
     <title>Terminal</title>
     <base href="/"/>
     <link href="css/app.css" rel="stylesheet"/>
-    
-    <link href="BlazorTerminal.Client.styles.css" rel="stylesheet" />
+    <link href="css/animations.css" rel="stylesheet">
+
+    <link href="BlazorTerminal.Client.styles.css" rel="stylesheet"/>
 </head>
 
 <body>
-<div id="app">
-    <div id="loading">
-        <div class="loadChar">
-            <span>A</span>
-            <span>ö</span>
-            <span>;</span>
-            <span>:</span>
-        </div>
-        <div class="loadChar">
-            <span>?</span>
-            <span>_</span>
-            <span>-</span>
-            <span>:</span>
-        </div>
-        <div class="loadChar">
-            <span>;</span>
-            <span>Å</span>
-            <span>&&</span>
-            <span>$</span>
-        </div>
-        <div class="loadChar">
-            <span>&</span>
-            <span>£</span>
-            <span>#</span>
-            <span>Ö</span>
-        </div>
+<div id="app" class="crt-monitor">
+    <div class="loading-container">
+        <span class="loading-block">█</span>
     </div>
 </div>
 
