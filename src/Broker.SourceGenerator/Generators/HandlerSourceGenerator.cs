@@ -64,10 +64,9 @@ public sealed class HandlerSourceGenerator : IIncrementalGenerator
               }
               """;
 
-    context.AddSource(
-    "HandlerServiceCollectionExtensions.g.cs",
-    handlerServiceCollectionExtensionsSource
-    );
-}
-
+        context.AddSource(
+            "HandlerServiceCollectionExtensions.g.cs",
+            handlerServiceCollectionExtensionsSource
+        );
+    }
 }

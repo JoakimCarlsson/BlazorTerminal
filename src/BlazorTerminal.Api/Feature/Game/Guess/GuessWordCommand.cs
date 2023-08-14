@@ -15,28 +15,28 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
     private readonly IGameSessionsRepository _gameSessionsRepository;
 
     public GuessWordCommandHandler(
-        IDistributedCache distributedCache, 
+        IDistributedCache distributedCache,
         IGameSessionsRepository gameSessionsRepository
         )
     {
         _distributedCache = distributedCache;
         _gameSessionsRepository = gameSessionsRepository;
     }
-    
+
     public async Task<Results<Ok<GuessedWordResponse>, NotFound, BadRequest>> HandleAsync(
         GuessWordCommand request,
         CancellationToken cancellationToken = default
         )
     {
         request.Deconstruct(out var gameId, out var model);
-        
+
         var gameSession = await GetGameSessionAsync(gameId);
         if (gameSession is null)
             return TypedResults.NotFound();
-        
+
         if (gameSession.Status != "In Progress") //TODO: use enum
             return TypedResults.BadRequest(); //TODO: return a more meaningful error message
-        
+
         if (gameSession.AttemptsRemaining == 0)
             return TypedResults.Ok(new GuessedWordResponse(
                 gameSession.Status == "Completed",
@@ -45,13 +45,13 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
                 0,
                 0
             ));
-        
+
         var likenessScore = CalculateLikenessScore(model.Word, gameSession.CorrectWord);
         if (likenessScore == gameSession.CorrectWord.Length)
         {
             gameSession.Status = "Completed";
             await UpdateGameSessionAsync(gameSession, cancellationToken);
-            
+
             return TypedResults.Ok(new GuessedWordResponse(
                 true,
                 false,
@@ -60,10 +60,10 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
                 gameSession.AttemptsRemaining
             ));
         }
-        
+
         gameSession.AttemptsRemaining--;
         await UpdateGameSessionAsync(gameSession, cancellationToken);
-        
+
         return TypedResults.Ok(new GuessedWordResponse(
             false,
             gameSession.AttemptsRemaining == 0,
@@ -74,7 +74,7 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
     }
 
     private async Task UpdateGameSessionAsync(
-        GameSession gameSession, 
+        GameSession gameSession,
         CancellationToken cancellationToken
         )
     {
@@ -94,12 +94,12 @@ internal sealed class GuessWordCommandHandler : IHandler<GuessWordCommand, Resul
         var gameSession = await _distributedCache.GetAsync<GameSession>(gameId.ToString());
         if (gameSession is not null)
             return gameSession;
-        
+
         return await _gameSessionsRepository.GetAsync(gameId);
     }
-    
+
     private int CalculateLikenessScore(
-        string guessWord, 
+        string guessWord,
         string currentWord
         )
     {

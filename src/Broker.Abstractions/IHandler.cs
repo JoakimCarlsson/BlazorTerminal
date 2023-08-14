@@ -9,7 +9,3 @@ public interface IHandler<in TRequest> where TRequest : IRequest
 {
     Task HandleAsync(TRequest request, CancellationToken cancellationToken = default);
 }
-
-public interface IRequest { }
-
-public interface IRequest<out TResponse>  { }

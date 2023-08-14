@@ -9,9 +9,7 @@ internal enum GameDifficulty
     Hard
 }
 
-internal sealed class
-    CreateGameSessionHandler : IHandler<CreateGameSessionCommand,
-        Results<Created<GameSessionDetailsResponse>, BadRequest>>
+internal sealed class CreateGameSessionHandler : IHandler<CreateGameSessionCommand, Results<Created<GameSessionDetailsResponse>, BadRequest>>
 {
     private readonly IGameSessionsRepository _gameSessionsRepository;
     private readonly IDistributedCache _distributedCache;
