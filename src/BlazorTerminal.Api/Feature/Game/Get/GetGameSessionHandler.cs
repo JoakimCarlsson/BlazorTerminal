@@ -4,8 +4,7 @@ internal sealed record GetGameSessionCommand(
     [FromRoute] Guid GameId
 ) : IRequest<Results<Ok<GameSessionDetailsResponse>, NotFound>>;
 
-internal sealed class
-    GetGameSessionHandler : IHandler<GetGameSessionCommand, Results<Ok<GameSessionDetailsResponse>, NotFound>>
+internal sealed class GetGameSessionHandler : IHandler<GetGameSessionCommand, Results<Ok<GameSessionDetailsResponse>, NotFound>>
 {
     private readonly IGameSessionsRepository _gameSessionsRepository;
     private readonly IDistributedCache _distributedCache;
