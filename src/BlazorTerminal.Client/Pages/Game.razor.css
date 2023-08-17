@@ -20,14 +20,14 @@
 }
 
 .word-char:hover {
-    background-color: #296f3a;
-    color: #15160c;
+    background-color: var(--green);
+    color: var(--dark-green);
     cursor: pointer;
 }
 
 .hovered {
-    background-color: #296f3a;
-    color: #15160c;
+    background-color: var(--green);
+    color: var(--dark-green);
     cursor: pointer;
 }
 

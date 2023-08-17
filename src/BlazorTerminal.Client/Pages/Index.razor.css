@@ -1,13 +1,10 @@
 .terminal {
-    /*background-color: var(--dark-green);*/
-    font-size: 16px;
+    font-size: var(--main-font-size);
     color: var(--green);
     line-height: 1.5;
 }
 
 .terminal-header {
-    /*background-color: var(--green);*/
-    /*color: var(--dark-green);*/
     font-weight: bold;
 }
 
