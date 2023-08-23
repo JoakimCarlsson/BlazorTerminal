@@ -1,16 +1,16 @@
 name: Trigger auto deployment for ca-blazorterminal-dev
 
 on:
+  push:
+    branches:
+      - main
   release:
     types:
       - created
 
-  workflow_dispatch:
-
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
@@ -20,14 +20,24 @@ jobs:
         with:
           creds: ${{ secrets.CABLAZORTERMINALDEV_AZURE_CREDENTIALS }}
 
-      - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v1
+      - name: Build and Push Docker image to ACR
+        run: |
+          az acr build --registry crblazorterminaldev.azurecr.io \
+                       --image ca-blazorterminal-dev:${{ github.sha }} \
+                       .
+
+  deploy-to-container-app:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1.4.3
         with:
-          dockerfilePath: src/BlazorTerminal.Api/Dockerfile
-          appSourcePath: ${{ github.workspace }}
-          registryUrl: crblazorterminaldev.azurecr.io
-          registryUsername: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }}
-          registryPassword: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}
-          containerAppName: ca-blazorterminal-dev
-          resourceGroup: rg-blazorterminal
-          imageToBuild: crblazorterminaldev.azurecr.io/ca-blazorterminal-dev:${{ github.sha }}
+          creds: ${{ secrets.CABLAZORTERMINALDEV_AZURE_CREDENTIALS }}
+
+      - name: Deploy Docker image to Container App
+        run: |
+          az container-app create --name ca-blazorterminal-dev \
+                                  --image crblazorterminaldev.azurecr.io/ca-blazorterminal-dev:${{ github.sha }} \
+                                  --resource-group rg-blazorterminal
