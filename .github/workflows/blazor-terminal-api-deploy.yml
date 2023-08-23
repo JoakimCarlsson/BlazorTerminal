@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - master
-  release:
-    types:
-      - created
+    tags:
+      - 'v*.*.*' # Trigger on tags like v1.0.0
 
 env:
   REGISTRY_URL: crblazorterminaldev.azurecr.io
@@ -16,10 +15,13 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
+
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Azure Login
         uses: azure/login@v1.4.3
@@ -30,12 +32,12 @@ jobs:
         run: |
           az acr build --registry ${{ env.REGISTRY_URL }} \
                        --file src/BlazorTerminal.Api/Dockerfile \
-                       --image ${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+                       --image ${{ env.CONTAINER_APP_NAME }}:${{ env.VERSION }} \
                        .
 
   deploy-to-container-instance:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Azure Login
         uses: azure/login@v1.4.3
@@ -45,10 +47,10 @@ jobs:
       - name: Create or Update Container Instance
         run: |
           az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
-                              --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+                              --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ env.VERSION }} \
                               --resource-group ${{ env.RESOURCE_GROUP }} \
                               --environment cae-blazorterminal-dev \
                               --registry-server crblazorterminaldev.azurecr.io \
                               --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
                               --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }} \
-                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="Endpoint=https://ap-blazorterminal-dev.azconfig.io;Id=NeiA;Secret=smv9ELjEsNhoXpaLyag+lakSNHWcdkmFe226PNhOqhA="
+                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ secrets.AZURE_APPCONFIG_CONNECTIONSTRING }}"
