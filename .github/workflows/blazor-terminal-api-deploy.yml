@@ -50,4 +50,5 @@ jobs:
                               --environment cae-blazorterminal-dev \
                               --registry-server crblazorterminaldev.azurecr.io \
                               --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
-                              --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}
+                              --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }} \
+                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="Endpoint=https://ap-blazorterminal-dev.azconfig.io;Id=NeiA;Secret=smv9ELjEsNhoXpaLyag+lakSNHWcdkmFe226PNhOqhA="
