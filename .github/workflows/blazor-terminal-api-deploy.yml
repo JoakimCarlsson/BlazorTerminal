@@ -34,7 +34,6 @@ jobs:
                        .
 
   deploy-to-container-instance:
-    needs: build-and-push
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     steps:
