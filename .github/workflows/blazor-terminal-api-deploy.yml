@@ -1,14 +1,9 @@
 name: Trigger auto deployment for ca-blazorterminal-dev
 
 on:
-  push:
-    branches:
-      [ master ]
-    paths:
-      - ".github/workflows/blazor-terminal-api-deploy.yml"
-      - "src/BlazorTerminal.Api/**"
-      - "src/Broker.Abstractions/**"
-      - "src/Broker.SourceGenerator/**"
+  release:
+    types:
+      - created
 
   workflow_dispatch:
 
