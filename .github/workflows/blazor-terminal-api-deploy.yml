@@ -55,5 +55,7 @@ jobs:
                               --environment ${{ env.ENVIRONMENT_NAME }} \
                               --registry-server ${{ env.REGISTRY_SERVER }} \
                               --registry-username ${{ env.REGISTRY_USERNAME }} \
-                              --registry-password ${{ env.REGISTRY_PASSWORD }} \
+                              --registry-password ${{ env.REGISTRY_PASSWORD }} \ 
+                              --ingress external --target-port 80 \
+                              --allow-insecure \
                               --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ env.AZURE_APPCONFIG_CONNECTIONSTRING }}"
