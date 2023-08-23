@@ -3,7 +3,7 @@ name: Trigger auto deployment for ca-blazorterminal-dev
 on:
   push:
     branches:
-      - main
+      - master
   release:
     types:
       - created
