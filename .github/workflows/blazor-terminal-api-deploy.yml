@@ -16,6 +16,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
@@ -44,7 +45,7 @@ jobs:
 
       - name: Create or Update Container Instance
         run: |
-          az container create --name ${{ env.CONTAINER_APP_NAME }} \
+          az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
                               --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
                               --resource-group ${{ env.RESOURCE_GROUP }} \
                               --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
