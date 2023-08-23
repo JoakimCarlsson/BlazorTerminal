@@ -11,6 +11,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
@@ -28,7 +29,6 @@ jobs:
                        .
                        
   deploy-to-container-app:
-    needs: build-and-push
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     steps:
