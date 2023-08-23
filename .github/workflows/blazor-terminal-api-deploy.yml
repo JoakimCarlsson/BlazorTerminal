@@ -30,7 +30,7 @@ jobs:
         run: |
           az acr build --registry ${{ env.REGISTRY_URL }} \
                        --file src/BlazorTerminal.Api/Dockerfile \
-                       --image ${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+                       --image ${{ env.CONTAINER_APP_NAME }}:5 \
                        .
 
   deploy-to-container-instance:
@@ -45,6 +45,6 @@ jobs:
       - name: Create or Update Container Instance
         run: |
           az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
-                              --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+                              --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:5 \
                               --resource-group ${{ env.RESOURCE_GROUP }} \
                               --environment cae-blazorterminal-dev
