@@ -46,6 +46,4 @@ jobs:
         run: |
           az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
                               --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
-                              --resource-group ${{ env.RESOURCE_GROUP }} \
-                              --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
-                              --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}
+                              --resource-group ${{ env.RESOURCE_GROUP }} 
