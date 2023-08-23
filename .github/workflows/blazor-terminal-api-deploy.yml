@@ -12,11 +12,6 @@ env:
   REGISTRY_URL: crblazorterminaldev.azurecr.io
   CONTAINER_APP_NAME: ca-blazorterminal-dev
   RESOURCE_GROUP: rg-blazorterminal
-  ENVIRONMENT_NAME: cae-blazorterminal-dev
-  REGISTRY_SERVER: crblazorterminaldev.azurecr.io
-  REGISTRY_USERNAME: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }}
-  REGISTRY_PASSWORD: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}
-  AZURE_APPCONFIG_CONNECTIONSTRING: ${{ secrets.AZURE_APPCONFIG_CONNECTIONSTRING }}
 
 jobs:
   build-and-push:
@@ -52,9 +47,8 @@ jobs:
           az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
                               --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
                               --resource-group ${{ env.RESOURCE_GROUP }} \
-                              --environment ${{ env.ENVIRONMENT_NAME }} \
-                              --registry-server ${{ env.REGISTRY_SERVER }} \
-                              --registry-username ${{ env.REGISTRY_USERNAME }} \
-                              --registry-password ${{ env.REGISTRY_PASSWORD }} \ 
-                              --ingress external --target-port 80 \
-                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ env.AZURE_APPCONFIG_CONNECTIONSTRING }}"
+                              --environment cae-blazorterminal-dev \
+                              --registry-server crblazorterminaldev.azurecr.io \
+                              --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
+                              --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }} \
+                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ secrets.AZURE_APPCONFIG_CONNECTIONSTRING }}"
