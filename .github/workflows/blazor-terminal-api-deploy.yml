@@ -23,9 +23,10 @@ jobs:
       - name: Build and Push Docker image to ACR
         run: |
           az acr build --registry crblazorterminaldev.azurecr.io \
+                       --file src/BlazorTerminal.Api/Dockerfile \
                        --image ca-blazorterminal-dev:${{ github.sha }} \
                        .
-
+                       
   deploy-to-container-app:
     needs: build-and-push
     runs-on: ubuntu-latest
