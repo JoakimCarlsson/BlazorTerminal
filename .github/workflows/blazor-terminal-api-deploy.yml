@@ -39,6 +39,6 @@ jobs:
 
       - name: Deploy Docker image to Container App
         run: |
-          az container-app create --name ca-blazorterminal-dev \
+          az container create --name ca-blazorterminal-dev \
                                   --image crblazorterminaldev.azurecr.io/ca-blazorterminal-dev:${{ github.sha }} \
                                   --resource-group rg-blazorterminal
