@@ -53,3 +53,10 @@ jobs:
                               --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
                               --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }} \
                               --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ secrets.AZURE_APPCONFIG_CONNECTIONSTRING }}"
+                              
+      - name: Update Container Instance Cors
+        run: |
+          az containerapp ingress cors enable --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --allowed-origins https://delightful-wave-0f6b91603.3.azurestaticapps.net --allowed-methods GET POST
+                              
