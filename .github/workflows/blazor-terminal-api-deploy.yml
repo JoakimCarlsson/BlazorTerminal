@@ -46,6 +46,7 @@ jobs:
         run: |
           az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
                               --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+                              --ingress external --target-port 80 \
                               --resource-group ${{ env.RESOURCE_GROUP }} \
                               --environment cae-blazorterminal-dev \
                               --registry-server crblazorterminaldev.azurecr.io \
