@@ -14,4 +14,8 @@
         <ProjectReference Include="..\Broker.Abstractions\Broker.Abstractions.csproj" />
         <ProjectReference Include="..\Broker.SourceGenerator\Broker.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images\" />
+    </ItemGroup>
 </Project>

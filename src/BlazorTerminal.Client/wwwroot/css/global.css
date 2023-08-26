@@ -1,7 +1,7 @@
 ﻿:root {
-    --dark-green: #15160c;
-    --green: #296f3a;
-
-    --main-font: 'Courier New', Courier, monospace;
-    --main-font-size: 16px;
+    --font: 'Courier New', Courier, monospace;
+    --font-size: 16px;
+    --background-color: #111c16;
+    --primary-text-color: #22cc77;
+    --secondary-text-color: #493162;
 }
