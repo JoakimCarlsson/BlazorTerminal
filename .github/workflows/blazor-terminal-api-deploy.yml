@@ -1,22 +1,21 @@
-name: Deploy to Azure Container Instance
+name: Trigger auto deployment for ca-blazorterminal-dev
 
 on:
   push:
     branches:
-      - master
-  release:
-    types:
-      - created
+      [ main ]
+    paths:
+      - ".github/workflows/blazor-terminal-api-deploy.yml"
+      - "src/BlazorTerminal.Api/**"
+      - "src/Broker.Abstractions/**"
+      - "src/Broker.SourceGenerator/**"
 
-env:
-  REGISTRY_URL: crblazorterminaldev.azurecr.io
-  CONTAINER_APP_NAME: ca-blazorterminal-dev
-  RESOURCE_GROUP: rg-blazorterminal
+  workflow_dispatch:
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
@@ -26,37 +25,14 @@ jobs:
         with:
           creds: ${{ secrets.CABLAZORTERMINALDEV_AZURE_CREDENTIALS }}
 
-      - name: Build and Push Docker image to ACR
-        run: |
-          az acr build --registry ${{ env.REGISTRY_URL }} \
-                       --file src/BlazorTerminal.Api/Dockerfile \
-                       --image ${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
-                       .
-
-  deploy-to-container-instance:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - name: Azure Login
-        uses: azure/login@v1.4.3
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
         with:
-          creds: ${{ secrets.CABLAZORTERMINALDEV_AZURE_CREDENTIALS }}
-
-      - name: Create or Update Container Instance
-        run: |
-          az containerapp create --name ${{ env.CONTAINER_APP_NAME }} \
-                              --image ${{ env.REGISTRY_URL }}/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
-                              --ingress external --target-port 80 \
-                              --resource-group ${{ env.RESOURCE_GROUP }} \
-                              --environment cae-blazorterminal-dev \
-                              --registry-server crblazorterminaldev.azurecr.io \
-                              --registry-username ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }} \
-                              --registry-password ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }} \
-                              --env-vars AZURE_APPCONFIG_CONNECTIONSTRING="${{ secrets.AZURE_APPCONFIG_CONNECTIONSTRING }}"
-                              
-      - name: Update Container Instance Cors
-        run: |
-          az containerapp ingress cors update --name ${{ env.CONTAINER_APP_NAME }} \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --allowed-origins https://delightful-wave-0f6b91603.3.azurestaticapps.net --allowed-methods GET POST
-                              
+          dockerfilePath: src/BlazorTerminal.Api/Dockerfile
+          appSourcePath: ${{ github.workspace }}
+          registryUrl: crblazorterminaldev.azurecr.io
+          registryUsername: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CABLAZORTERMINALDEV_REGISTRY_PASSWORD }}
+          containerAppName: ca-blazorterminal-dev
+          resourceGroup: rg-blazorterminal
+          imageToBuild: crblazorterminaldev.azurecr.io/ca-blazorterminal-dev:${{ github.sha }}
